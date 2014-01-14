@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta content="charset=utf-8">
+	<title>Smile</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
+	<style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+</head>
+<body>
+	
+	
+	<div id="map-canvas" style="width: 100%; height: 100%;"></div>
+	
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+
+	
+	<script type="text/javascript">
+
+		function initialize() {
+			var myLatlng = new google.maps.LatLng(42.367222222222225, -71.07083333333334);
+			var mapOptions = {
+				zoom: 15,
+				center: myLatlng,
+				mapTypeId: google.maps.MapTypeId.ROAaDMAP
+			}
+			map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+			
+			// Initialize overlay over a button NOT on initialize.
+			// That means remove this later on.
+			overlay_magic();
+			
+		}
+		
+		google.maps.event.addDomListener(window, 'load', initialize);
+		
+		timestamp = "";
+		
+		function new_data_to_fetch() {
+			var url = 'http://127.0.0.1/uav/smile/tiles-list.html';
+			var data = $.ajax({
+						url:  url,
+						dataType: "json", 
+						async: false
+					}); // This will wait until you get a response from the ajax request.
+			
+			list = data.responseText.split(';');
+			newData = list[0];
+			if(newData != timestamp) {
+				timestamp = newData;
+				return true;
+			}
+			return false;
+		}
+		
+		function get_all_tiles() {
+			var precision = 20;
+			var fileNamePrecision = 1;
+			var baseImgURL = 'http://127.0.0.1/uav/smile/tiles/';
+			var url = 'http://127.0.0.1/uav/smile/tiles-list.html';
+			var data = $.ajax({
+						url:  url,
+						dataType: "json", 
+						async: false
+					}); // This will wait until you get a response from the ajax request.
+			
+			list = data.responseText.split(';');
+			// Remove the first element because it's a Boolean describing whether there's new data to fetch or not.
+			list.shift();
+			tiles = [];
+			for (i = 0; i < list.length; i++) {
+				tile = Object();
+				tile['coordinates'] = Object();
+				tile['coordinates']['nw'] = [ (list[i].split(',')[0] - 0.0).toFixed(precision), (parseFloat( list[i].split(',')[1].split('.')[0] + '.' + list[i].split(',')[1].split('.')[1] ) + 0.0).toFixed(precision) ];
+				tile['coordinates']['se'] = [ (list[i].split(',')[0] - 5.0).toFixed(precision), (parseFloat( list[i].split(',')[1].split('.')[0] + '.' + list[i].split(',')[1].split('.')[1] ) + 5.0).toFixed(precision) ];
+				tile['path'] 		= baseImgURL + parseFloat(tile['coordinates']['nw'][0]).toFixed(fileNamePrecision) + ',' + parseFloat(tile['coordinates']['nw'][1]).toFixed(fileNamePrecision) + '.png';
+				
+				// The above path to URL loads the cached image. But I want it to be reloaded from server every time a request is made.
+				
+				tile['path']		= tile['path'] + '?r=' + Math.random();
+				tiles.push(tile);
+			}
+			return tiles;
+		}
+		
+		function prepare_overlay() {
+			tiles = get_all_tiles();
+			
+			overlays = [];
+			for (i = 0; i < tiles.length; i++) {
+				tile = tiles[i];
+				
+				var nw = [ tile['coordinates']['nw'][0]/3600, tile['coordinates']['nw'][1]/3600 ]; 
+				var se = [ tile['coordinates']['se'][0]/3600, tile['coordinates']['se'][1]/3600 ]; 
+				
+				/*
+				Shouldn't the order below be:
+					se[0], nw[1],
+					nw[0], se[1]
+				*/
+				var imgURL = tile['path'];
+				var imageBounds = new google.maps.LatLngBounds(
+										  new google.maps.LatLng(se[0], nw[1]),
+										  new google.maps.LatLng(nw[0], se[1])
+									);
+				 
+				 overlay = new google.maps.GroundOverlay(imgURL, imageBounds);
+				 overlays.push(overlay);
+				 /*
+				 var marker = new google.maps.Marker({
+					  position: new google.maps.LatLng(nw[0], nw[1]),
+					  map: map,
+					  title: 'Hello World!'
+				  });
+				  var marker = new google.maps.Marker({
+					  position: new google.maps.LatLng(se[0], se[1]),
+					  map: map,
+					  title: 'Hello World!'
+				  });
+				  */
+			}
+			return overlays;
+			 
+		}
+		
+		
+		function overlay_magic() {
+			overlays = prepare_overlay();
+			for (i = 0; i < overlays.length; i++) {
+				overlays[i].setMap(map);
+			}
+			console.log('Fetching new tiles.');
+		}
+		
+		
+		$(document).ready(function() {
+			window.setInterval(function() {
+									if( new_data_to_fetch() ) {
+										overlay_magic();
+									}
+								} , 15000);
+		});
+	</script>
+
+</body>
+</html>

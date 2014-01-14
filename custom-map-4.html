@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta content="charset=utf-8">
+	<title>CUSTOM MAP 4</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+    
+</head>
+<body>
+	<div class="container window">
+		<div class="row">
+			
+			<div class="col-md-1 data-types">
+				<div class="row hyperspectral">Hyperspectral</div>
+				<div class="row chloro">Chlorophyll</div>
+				<div class="row phy">Phycocyanin</div>
+				<div class="row uav-location">UAV Location</div>
+				<div class="row abc">Nitrogen</div>
+				<div class="row abc">Phosphorus</div>
+				<div class="row abc">Temperature</div>
+				<div class="row abc">Dissolved Oxygen</div>
+				<div class="row abc">pH</div>
+				<div class="row tracking">Tracking</div>
+			</div><!--/.data-types -->
+			
+			<div class="col-md-8 map">
+				<div class="row map-box">
+					<div id="map-canvas" style="width: 100%; height: 100%;"></div>
+				</div>
+			</div><!--/.map -->
+			
+			<div class="col-md-1 tasks">
+				<div class="row imaging-area">Aerial Imaging Area</div>
+				<div class="row water-probe">Water Probe Locations</div>
+			</div><!--/.tasks -->
+
+			<div class="col-md-2 chat-log">
+				<textarea class="log" rows="30" cols="30"></textarea>
+			</div><!--/.chat-log -->
+			
+		</div><!--/.row -->
+		
+		<div class="row" style="padding: 5px;">
+				<div class="col-md-1">Hey</div>
+				<div class="col-md-8">Hey</div>
+				
+				<div class="col-md-3 jarvis">
+
+				</div><!--/.jarvis -->
+				
+		</div><!--/.row -->
+		
+	</div><!--/.container -->
+	
+	
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+	
+	<script src="./js/keydragzoom_packed.js" type="text/javascript"></script>
+	<script src="./js/jquery.md5.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		$('.log').text("mu, sigma = 3., 1. # mean and standard deviation\n\ns = np.random.lognormal(mu, sigma, 1000)\n\nimport matplotlib.pyplot as plt\n\ncount, bins, ignored = plt.hist(s, 100, normed=True, align='mid')");	
+	</script>
+	
+	<script type="text/javascript">
+		
+		var TILE_SIZE = 256;
+		
+		function bound(value, opt_min, opt_max) {
+			if (opt_min != null) value = Math.max(value, opt_min);
+			if (opt_max != null) value = Math.min(value, opt_max);
+			return value;
+		}
+
+		function degreesToRadians(deg) {
+			return deg * (Math.PI / 180);
+		}
+
+		function radiansToDegrees(rad) {
+			return rad / (Math.PI / 180);
+		}		
+		
+		
+		/** @constructor */
+		function MercatorProjection() {
+		  this.pixelOrigin_ = new google.maps.Point(TILE_SIZE / 2,
+			  TILE_SIZE / 2);
+		  this.pixelsPerLonDegree_ = TILE_SIZE / 360;
+		  this.pixelsPerLonRadian_ = TILE_SIZE / (2 * Math.PI);
+		}
+
+		MercatorProjection.prototype.fromLatLngToPoint = function(latLng,
+			opt_point) {
+		  var me = this;
+		  var point = opt_point || new google.maps.Point(0, 0);
+		  var origin = me.pixelOrigin_;
+
+		  point.x = origin.x + latLng.lng() * me.pixelsPerLonDegree_;
+
+		  // Truncating to 0.9999 effectively limits latitude to 89.189. This is
+		  // about a third of a tile past the edge of the world tile.
+		  var siny = bound(Math.sin(degreesToRadians(latLng.lat())), -0.9999,
+			  0.9999);
+		  point.y = origin.y + 0.5 * Math.log((1 + siny) / (1 - siny)) *
+			  -me.pixelsPerLonRadian_;
+		  return point;
+		};
+
+		MercatorProjection.prototype.fromPointToLatLng = function(point) {
+		  var me = this;
+		  var origin = me.pixelOrigin_;
+		  var lng = (point.x - origin.x) / me.pixelsPerLonDegree_;
+		  var latRadians = (point.y - origin.y) / -me.pixelsPerLonRadian_;
+		  var lat = radiansToDegrees(2 * Math.atan(Math.exp(latRadians)) -
+			  Math.PI / 2);
+		  return new google.maps.LatLng(lat, lng);
+		};
+
+		function createInfoWindowContent() {
+		  var numTiles = 1 << map.getZoom();
+		  var projection = new MercatorProjection();
+		  var worldCoordinate = projection.fromLatLngToPoint(chicago);
+		  var pixelCoordinate = new google.maps.Point(
+			  worldCoordinate.x * numTiles,
+			  worldCoordinate.y * numTiles);
+		  var tileCoordinate = new google.maps.Point(
+			  Math.floor(pixelCoordinate.x / TILE_SIZE),
+			  Math.floor(pixelCoordinate.y / TILE_SIZE));
+
+		  return [
+			'Cambridge, MA',
+			'LatLng: ' + chicago.lat() + ' , ' + chicago.lng(),
+			'World Coordinate: ' + worldCoordinate.x + ' , ' +
+			  worldCoordinate.y,
+			'Pixel Coordinate: ' + Math.floor(pixelCoordinate.x) + ' , ' +
+			  Math.floor(pixelCoordinate.y),
+			'Tile Coordinate: ' + tileCoordinate.x + ' , ' +
+			  tileCoordinate.y + ' at Zoom Level: ' + map.getZoom()
+		  ].join('<br>');
+		}
+		
+		
+		
+		// Coordinates calculation above this point.
+		
+		function CoordMapType(tileSize) {
+			this.tileSize = tileSize;
+		}
+
+		CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+		  var div = ownerDocument.createElement('div');
+		  div.innerHTML = coord;
+		  div.style.width = this.tileSize.width + 'px';
+		  div.style.height = this.tileSize.height + 'px';
+		  div.style.fontSize = '10';
+		  div.style.borderStyle = 'solid';
+		  div.style.borderWidth = '1px';
+		  div.style.borderColor = '#AAAAAA';
+		  return div;
+		};
+
+		var map;
+		var chicago = new google.maps.LatLng(41.850033,-87.6500523);
+		var cambridge = new google.maps.LatLng(42.3544, -71.0946);
+		
+		function initialize() {
+		  var mapOptions = {
+			zoom: 15,
+			center: cambridge,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		  };
+		  map = new google.maps.Map(document.getElementById("map-canvas"),
+			  mapOptions);
+
+		  // Insert this overlay map type as the first overlay map type at
+		  // position 0. Note that all overlay map types appear on top of
+		  // their parent base map.
+		  map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256)));
+		  
+		  
+		  
+		  var coordInfoWindow = new google.maps.InfoWindow();
+		  coordInfoWindow.setContent(createInfoWindowContent());
+		  coordInfoWindow.setPosition(chicago);
+		  coordInfoWindow.open(map);
+
+		  google.maps.event.addListener(map, 'zoom_changed', function() {
+			coordInfoWindow.setContent(createInfoWindowContent());
+			coordInfoWindow.open(map);
+		  });
+		  
+		}
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+		
+	</script>
+
+</body>
+</html>

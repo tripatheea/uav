@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta content="charset=utf-8">
+	<title>SCL :: UAV</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+</head>
+<body>
+	<div>
+		Each marker seperated by a semicolon.<br><br>
+		42.3535, -71.0938, 'Two beavers are better than one!'; 42.3535, -71.0838, 'Careful!'<br><br>
+		<textarea class="info"></textarea><br>
+		<input type="button" value="Send" class='send'>
+	</div>
+
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>	
+	<script type="text/javascript">
+		$('.send').click(function() {
+			info = $('.info').val();
+			data = 'info=' + info;
+			$.ajax({
+					url: "http://127.0.0.1/uav/php/addLocations.php",
+					type: "POST",
+					data: data,
+					cache: false,
+			});
+		});
+    </script>
+</body>
+</html>

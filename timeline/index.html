@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta content="charset=utf-8">
+	<title>Timeline</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    
+    <style type="text/css">
+		/* This hides the line from the graph. */
+		rect {
+			
+		}
+		
+		g.highcharts-button {
+			
+		}
+	</style>
+    
+</head>
+<body>
+	
+	<div id="container" style="height: 500px; min-width: 500px"></div>
+	
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<script type="text/javascript">
+		var url = 'http://127.0.0.1/uav/timeline/data.html';
+		var data = $.ajax({
+					url:  url,
+					dataType: "json", 
+					async: false
+				}); // This will wait until you get a response from the ajax request.
+			
+		data = JSON.parse(data.responseText);
+		
+	</script>
+	
+	<script type="text/javascript">
+		$(function () { 
+			$('#container').highcharts('StockChart', {
+				rangeSelector : {
+					selected : 1
+				},
+				title: {
+					text: 'Fruit Consumption'
+				},
+				series: [{
+					data: data,
+					tooltip: {
+								enabled: false
+							}
+				}]
+			});
+		});
+	</script>
+	
+	
+	<script type="text/javascript">
+		/*
+		
+		<g class="highcharts-button" style="cursor:default;" title="Chart context menu" stroke-linecap="round" transform="translate(1252,10)"><title>Chart context menu</title><rect rx="2" ry="2" fill="white" x="0.5" y="0.5" width="24" height="22" stroke="none" stroke-width="1"></rect><path fill="#E0E0E0" d="M 6 6.5 L 20 6.5 M 6 11.5 L 20 11.5 M 6 16.5 L 20 16.5" stroke="#666" stroke-width="3" zIndex="1"></path><text x="0" y="13" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Verdana, Arial, Helvetica, sans-serif;font-size:12px;color:black;fill:black;" zIndex="1"></text></g>
+		
+		*/
+		
+		$("g").remove(".highcharts-button");
+		
+	</script>
+	
+	<script src="./js/highstock.js"></script>
+	<script src="./js/modules/exporting.js"></script>
+
+</body>
+</html>
