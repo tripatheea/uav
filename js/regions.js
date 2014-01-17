@@ -1,7 +1,9 @@
-function Rectangle(nw, se, selected) {
+function Rectangle(nw, se, selected, name) {
 	this.nw = nw;
 	this.se = se;
 	this.selected = selected;
+	this.action = Array();
+	this.name = name;
 }
 
 
@@ -27,7 +29,7 @@ function divide_into_grids(rect, division) {
 			
 			nw[0] = rect['nw'][0] - j * gridHeight;
 			se[0] = rect['nw'][0] - (j + 1) * gridHeight;
-			grids[i + ',' + j] = new Rectangle(nw, se, false);
+			grids[j + ',' + i] = new Rectangle(nw, se, false, '');
 		}
 	}
 	return grids;
@@ -41,7 +43,7 @@ function draw_grid(position) {
 	
 	var nw = position[0];
 	var se = position[1];
-	var bigRectangle = new Rectangle(nw, se, false);
+	var bigRectangle = new Rectangle(nw, se, false, '');
 	
 	//grids = divide_into_grids(bigRectangle, [3,3]);
 	
@@ -91,6 +93,8 @@ function draw_grid(position) {
 		overlayText = String.fromCharCode(65 + i);
         tile = new tileOverlay(bounds, overlayText, map, index, selected);
         
+        grids[index]['name'] = overlayText;
+		
 		i++;
 	}
 	// Just for reference.
@@ -99,26 +103,49 @@ function draw_grid(position) {
 
 
 
+/* 
+ * Helper functions for marking the grids.
+ * Related to sending the grid data to TERCIO (task planning)
+ *
+ */
 
 
+// FOR SOME REASON THE x and y coordinates of the tile index have been flipped. Figure out why and correct that.
+// Right now I'm using a quick hack to fix that.
+
+function flash_tile(commaIndex) {
+	
+	// Use this to trigger a sort of warning about a particular tile.
+	
+	var hyphenIndex = commaIndex.split(',');
+	commaIndex = hyphenIndex[0] + ',' + hyphenIndex[1];
+	var hyphenIndex = hyphenIndex[0] + '-' + hyphenIndex[1];
+	var selector = "." + hyphenIndex;
+	
+	grids[commaIndex]['action'] = Array('flash');
+	
+	setInterval( function(){
+					$(selector).trigger( "click" );
+				}, 500);
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function autonomous_select(commaIndex) {
+	
+	// Use this to mark the tile/s that the autonomous robot selects.
+	// Sort of like the total tiles - the tiles selected by the human.
+	
+	var hyphenIndex = commaIndex.split(',');
+	commaIndex = hyphenIndex[0] + ',' + hyphenIndex[1];
+	var hyphenIndex = hyphenIndex[0] + '-' + hyphenIndex[1];
+	var selector = "." + hyphenIndex;
+	
+	grids[commaIndex]['action'] = Array('autonomous_select');
+	
+	setInterval( function(){
+					$(selector).trigger( "click" );
+				}, 500);
+}
 
 
 
@@ -173,7 +200,8 @@ tileOverlay.prototype.onAdd = function() {
 	/* 
 	 * Bind another event like double click or something like that to each tile here.
 	 * Trigger that from script.js somewhere along the line of the jarvis thingy.
-	 * Use that trigger (and event) to change the color, like all that stuff about tiles the user-selected UAV is going to vs the tiles the autonomous UAVS are going to.
+	 * Use that trigger (and event) to change the color, like all that stuff about 
+	 * tiles the user-selected UAV is going to vs the tiles the autonomous UAVS are going to.
 	 * Like that green and red and stuff like that.
 	 * 
 	 * See line ~368 of script.js
@@ -193,31 +221,73 @@ tileOverlay.prototype.onAdd = function() {
 	// set this as locally scoped var so event does not get confused
 	var me = this;
 
-	// Add a listener - we'll accept clicks anywhere on this div, but you may want
-	// to validate the click i.e. verify it occurred in some portion of your overlay.
-	google.maps.event.addDomListener(div, 'click', function() {
-		//alert('You clicked on: ' + index);
-		//alert(div.style.background);
-		
-		// Right now, it just changes the background color.
-		// Come up with something to actually have an Object or an array hold data about which tiles have been selected. 
-		// Update that array/object values here.
-		
-		// Use 'me' to access the parent element. 'this' points to the new event.
-		
-		// Also good idea to use an "outside" array to hold select information and use the selected property of me only for coloring purposes.
-		// Maybe use the index to point to a particular tile on some external Object / array variable?
-		if ( ! me.selected) {
-			div.style.background = 'rgb(35, 156, 152)';
-			div.style.color = 'rgb(255, 255, 255)';
-			me.selected = true;
-		} 
-		else {
-			div.style.background = 'rgb(255, 255, 255)';
-			div.style.color = 'rgb(0, 0, 0)';
-			me.selected = false;
-		}
-	});
+	/*
+	 *   _______           _______  _       _________ _______ 
+	 *	(  ____ \|\     /|(  ____ \( (    /|\__   __/(  ____ \
+	 *	| (    \/| )   ( || (    \/|  \  ( |   ) (   | (    \/
+	 *	| (__    | |   | || (__    |   \ | |   | |   | (_____ 
+	 *	|  __)   ( (   ) )|  __)   | (\ \) |   | |   (_____  )
+	 *	| (       \ \_/ / | (      | | \   |   | |         ) |
+	 * 	| (____/\  \   /  | (____/\| )  \  |   | |   /\____) |
+	 *	(_______/   \_/   (_______/|/    )_)   )_(   \_______)
+	 *
+	 */														  
+
+
+	/* 
+	 * Add a listener to listen for clicks. A click will mark current grid as selected and also change its color.
+	 * Note that this is different from other events like double click which just flashes the current tile but has no effect
+	 * whatsoever on the selected property of the underlying Rectangle() object.
+	 */
+
+			// We'll accept clicks anywhere on this div, but you may want
+			// to validate the click i.e. verify it occurred in some portion of your overlay.
+			
+			google.maps.event.addDomListener(div, 'click', function() {
+				
+				/* 
+				 * Use 'me' to access the parent element. 'this' points to the new event.
+				 * The array 'grids' holds Rectangle() objects.
+				 * Each Rectangle() has a boolean property called 'selected' which is toggled true/false below.
+				 * 
+				 */
+				
+				var action = grids[index]['action'];
+				
+				
+				if ((action.indexOf('select') > -1) || (action.length == 0)) {
+					console.log('Selecting...');
+					if ( ! grids[index]['selected']) {
+						div.style.background = 'rgb(35, 156, 152)';
+						div.style.color = 'rgb(255, 255, 255)';
+						grids[index]['selected'] = true;
+					}
+					else {
+						div.style.background = 'rgb(255, 255, 255)';
+						div.style.color = 'rgb(0, 0, 0)';
+						grids[index]['selected'] = false;
+					}
+				}
+				
+				if (action.indexOf('flash') > -1) {
+						console.log('Flashing...');
+						div.style.background = 'rgb(224, 0, 0)';
+						div.style.color = 'rgb(254, 254, 254)';
+						
+						setTimeout( function(){
+								div.style.background = 'rgb(254, 254, 254)';
+								div.style.color = 'rgb(0, 0, 0)';
+						}, 300);		// This time here must be less than the time in line ~115 i.e. time in the function flash_tile().
+				}
+				
+				if (action.indexOf('autonomous_select') > -1) {
+					div.style.background = 'rgb(0, 224, 0)';
+					div.style.color = 'rgb(254, 254, 254)';
+				}
+				
+			});
+			
+	 
   
 };
 

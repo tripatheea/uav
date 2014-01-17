@@ -1,24 +1,114 @@
+/*
+ * The following code is to remove the Satellite / Hybrid / Terrain / Roadmap map and instead show a gray area.
+ *
+ * I'm just creating a custom maptype but not supplying any tile sources to force Maps to show the defauly- the gray tiles.
+ * 
+ */
+
+function CoordMapType() {
+}
+
+CoordMapType.prototype.tileSize = new google.maps.Size(256,256);
+CoordMapType.prototype.maxZoom = 20;
+
+CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+	return ownerDocument.createElement('div');
+};
+
+CoordMapType.prototype.name = "UAV Map";
+CoordMapType.prototype.alt = "UAV Map";
+
+var map;
+var coordinateMapType = new CoordMapType();
+
+
+/* 
+ * Initalize the awesome! 
+ * 
+ */
+
 function initialize() {
-	var myLatlng = new google.maps.LatLng(42.3544, -71.0946);
+	var minZoomLevel = 15;
+	var myLatlng = new google.maps.LatLng(42.35398, -71.08480);
 	var mapOptions = {
-		zoom: 15,
+		zoom: minZoomLevel,
 		center: myLatlng,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
-		tilt: 0
+		tilt: 0,
+		disableDefaultUI: true,
+		mapTypeControlOptions: {
+			mapTypeIds: ['coordinate']
+		}
 	}
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	
+	
+	
 	
 	// Overlay
 	var imgURL = 'http://www.aashishtripathee.com/wp-content/uploads/2014/01/hyper.png';			
 	var imageBounds = new google.maps.LatLngBounds(
-							  new google.maps.LatLng(42.3481, -71.106),
+							  new google.maps.LatLng(42.3481, -71.1060),
 							  new google.maps.LatLng(42.3605, -71.0835)
 						);
-	 // new google.maps.LatLng(42.3622, -71.021),
-	 // new google.maps.LatLng(42.3122, -71.10843));  
+	historicalOverlay = new google.maps.GroundOverlay(imgURL, imageBounds);
+	// new google.maps.LatLng(42.3622, -71.021),
+	// new google.maps.LatLng(42.3122, -71.10843)); 
+	
+	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png'; 
+	var floorBounds = new google.maps.LatLngBounds(
+								new google.maps.LatLng(42.346050, -71.100667),		// South-West
+								new google.maps.LatLng(42.361895, -71.06895)		// North-East
+						);
+	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
+	floorOverlay.setMap(map);
+	
+	/* 
+	 * The followin is just to bind the custom map to Map.
+	 * Remove all below this line (inside the current function of course if you'd rather show a satellite (or roadmap or terrain or hybrid) map.
+	 *  
+	 */
 	 
-	 historicalOverlay = new google.maps.GroundOverlay(imgURL, imageBounds);
-	 
+	// Now attach the coordinate map type to the map's registry.
+	map.mapTypes.set('coordinate',coordinateMapType);
+
+	// We can now set the map to use the 'coordinate' map type.
+	map.setMapTypeId('coordinate');
+	
+	/*
+	 * The following is to limit panning to the region defined by the floorplan.
+	 * 
+	 */
+	
+	var allowedBounds = floorBounds;
+
+	// Listen for the dragend event
+	google.maps.event.addListener(map, 'dragend', function() {
+		
+		if (allowedBounds.contains(map.getCenter())) return;
+
+		// Out of bounds - Move the map back within the bounds
+		var c = map.getCenter(),
+		x = c.lng(),
+		y = c.lat(),
+		maxX = allowedBounds.getNorthEast().lng(),
+		maxY = allowedBounds.getNorthEast().lat(),
+		minX = allowedBounds.getSouthWest().lng(),
+		minY = allowedBounds.getSouthWest().lat();
+
+		if (x < minX) x = minX;
+		if (x > maxX) x = maxX;
+		if (y < minY) y = minY;
+		if (y > maxY) y = maxY;
+
+		map.setCenter(new google.maps.LatLng(y, x));
+	});
+
+	// Limit the zoom level
+	google.maps.event.addListener(map, 'zoom_changed', function() {
+		if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
+	});
+	
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -371,10 +461,10 @@ function populate_instructions() {
 
 $(document).on("click",".jarvis-imaging-1-yes",function(){
 	$('.jarvis').html(instructions['imaging'][2]);
-	$( ".0-1" ).trigger( "click" );
-	
 	// See line ~170 of regions.js
-	
+	// $( ".0-1" ).trigger( "click" );
+	console.log( "Data ready to be transmitted!" );
+	console.log(grids);
 });
 
 $(document).on("click",".jarvis-imaging-1-no",function(){
