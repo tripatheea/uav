@@ -49,7 +49,7 @@ function draw_grid(position) {
 	var min = 2;
 	var random1 = Math.floor((Math.random() * ((max + 1) - min)) + min);
 	var random2 = Math.floor((Math.random() * ((max + 1) - min)) + min);
-	grids = divide_into_grids(bigRectangle, [3, 3]);
+	grids = divide_into_grids(bigRectangle, [4, 4]);
 	
 	var i = 0;
 	for (var index in grids) {
