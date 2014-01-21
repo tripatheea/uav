@@ -27,7 +27,7 @@
 		}
 
 		CoordMapType.prototype.tileSize = new google.maps.Size(256,256);
-		CoordMapType.prototype.maxZoom = 25;
+		CoordMapType.prototype.maxZoom = 30;
 
 		CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
 			var div = ownerDocument.createElement('div');
@@ -158,20 +158,21 @@
 										  new google.maps.LatLng(nw[0], se[1])
 									);
 				 
-				 overlay = new google.maps.GroundOverlay(imgURL, imageBounds);
-				 overlays.push(overlay);
-				 /*
-				 var marker = new google.maps.Marker({
-					  position: new google.maps.LatLng(nw[0], nw[1]),
-					  map: map,
-					  title: 'Hello World!'
-				  });
-				  var marker = new google.maps.Marker({
-					  position: new google.maps.LatLng(se[0], se[1]),
-					  map: map,
-					  title: 'Hello World!'
-				  });
-				  */
+				overlay = new google.maps.GroundOverlay(imgURL, imageBounds);
+				overlays.push(overlay);
+				
+				/*
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(nw[0], nw[1]),
+					map: map,
+					title: 'Hello World!'
+				});
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(se[0], se[1]),
+					map: map,
+					title: 'Hello World!'
+				});
+				*/
 			}
 			return overlays;
 			 

@@ -1,4 +1,1 @@
-User selects a big rectangle.
-Divide that into smaller uniform rectangles.
-User selects certain sub-rectangles.
-Send a JSON that represents the entire rectangle. A rectangle object with sub-rectangle sub-objects. Use the two coordinates of these sub-rectangles and also an attribute something like "selected" to mark which rectangles were selected.
+Include the size (rows and columns) of the big rectangle in the JSON file.

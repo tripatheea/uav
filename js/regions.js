@@ -19,7 +19,8 @@ function divide_into_grids(rect, division) {
 	var gridWidth = width/xDivision;
 	var gridHeight = height/yDivision;
 	
-	grids = Object();
+	
+	grids2 = Object();
 	for (var i = 0; i < xDivision; i++) {	// Changes longitude.
 		for (var j = 0; j < yDivision; j++ ) {	// Changes latitude.
 			var nw = [];
@@ -29,10 +30,10 @@ function divide_into_grids(rect, division) {
 			
 			nw[0] = rect['nw'][0] - j * gridHeight;
 			se[0] = rect['nw'][0] - (j + 1) * gridHeight;
-			grids[j + ',' + i] = new Rectangle(nw, se, false, '');
+			grids2[j + ',' + i] = new Rectangle(nw, se, false, '');
 		}
 	}
-	return grids;
+	return grids2;
 }
 
 function draw_grid(position) {
@@ -51,39 +52,18 @@ function draw_grid(position) {
 	var min = 2;
 	var random1 = Math.floor((Math.random() * ((max + 1) - min)) + min);
 	var random2 = Math.floor((Math.random() * ((max + 1) - min)) + min);
-	grids = divide_into_grids(bigRectangle, [4, 4]);
+	xNumber = 4;
+	yNumber = 4;
+	grids = Object();
+	
+	grids['width'] = xNumber;
+	grids['height'] = yNumber;
+	grids['points'] = divide_into_grids(bigRectangle, [xNumber, yNumber]);
 	
 	var i = 0;
-	for (var index in grids) {
-		rect = grids[index];
+	for (var index in grids['points']) {
+		rect = grids['points'][index];
 		
-		
-		// Realize that I've added two custom properties for each rectangle below.
-		// They are index and selected, with self-explanatory meanings.
-		/*
-		var rectangle = new google.maps.Rectangle({
-										strokeColor: '#fff',
-										strokeOpacity: 0.6,
-										strokeWeight: 1,
-										fillColor: '#fff',
-										fillOpacity: 0.4,
-										map: map,
-										index: index,
-										selected: false,
-										bounds: new google.maps.LatLngBounds(
-										  new google.maps.LatLng(rect['nw'][0], rect['nw'][1]),
-										  new google.maps.LatLng(rect['se'][0], rect['se'][1]))
-									  });
-		google.maps.event.addListener(rectangle, 'click', function (event) {
-			alert('You clicked on ' + this.index);
-			// Change color of marked region. More importantly, mark it as selected.
-			this.setOptions( { fillColor: '#ff0000', strokeColor: '#ff0000', selected: true }); 
-		});  
-		*/
-		/*
-		var swBound = new google.maps.LatLng(rect['se'][0], rect['nw'][1]);
-		var neBound = new google.maps.LatLng(rect['nw'][0], rect['se'][1]);
-		*/
 		var swBound = new google.maps.LatLng(rect['se'][1], rect['nw'][0]);
 		var neBound = new google.maps.LatLng(rect['nw'][1], rect['se'][0]);
 		
@@ -93,10 +73,13 @@ function draw_grid(position) {
 		overlayText = String.fromCharCode(65 + i);
         tile = new tileOverlay(bounds, overlayText, map, index, selected);
         
-        grids[index]['name'] = overlayText;
+        grids['points'][index]['name'] = overlayText;
 		
 		i++;
 	}
+	
+	
+	
 	// Just for reference.
 	//console.log(grids);
 }
@@ -252,20 +235,20 @@ tileOverlay.prototype.onAdd = function() {
 				 * 
 				 */
 				
-				var action = grids[index]['action'];
+				var action = grids['points'][index]['action'];
 				
 				
 				if ((action.indexOf('select') > -1) || (action.length == 0)) {
 					console.log('Selecting...');
-					if ( ! grids[index]['selected']) {
+					if ( ! grids['points'][index]['selected']) {
 						div.style.background = 'rgb(35, 156, 152)';
 						div.style.color = 'rgb(255, 255, 255)';
-						grids[index]['selected'] = true;
+						grids['points'][index]['selected'] = true;
 					}
 					else {
 						div.style.background = 'rgb(255, 255, 255)';
 						div.style.color = 'rgb(0, 0, 0)';
-						grids[index]['selected'] = false;
+						grids['points'][index]['selected'] = false;
 					}
 				}
 				

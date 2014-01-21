@@ -28,10 +28,10 @@ var coordinateMapType = new CoordMapType();
  */
 
 function initialize() {
-	var minZoomLevel = 15;
-	var myLatlng = new google.maps.LatLng(42.35398, -71.08480);
+	var minZoomLevel = 8;
+	var myLatlng = new google.maps.LatLng(1.5235, 1.2445);
 	var mapOptions = {
-		zoom: minZoomLevel,
+		zoom: (minZoomLevel - 1),
 		center: myLatlng,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		tilt: 0,
@@ -55,11 +55,18 @@ function initialize() {
 	// new google.maps.LatLng(42.3622, -71.021),
 	// new google.maps.LatLng(42.3122, -71.10843)); 
 	
-	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png'; 
+	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=2'; 
+	/*
 	var floorBounds = new google.maps.LatLngBounds(
 								new google.maps.LatLng(42.346050, -71.100667),		// South-West
 								new google.maps.LatLng(42.361895, -71.06895)		// North-East
 						);
+	*/
+	var floorBounds = new google.maps.LatLngBounds(
+								new google.maps.LatLng(0, 0),		// South-West
+								new google.maps.LatLng(3.047, 2.489)		// North-East
+						);
+	
 	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
 	floorOverlay.setMap(map);
 	
@@ -464,7 +471,7 @@ $(document).on("click",".jarvis-imaging-1-yes",function(){
 	// See line ~170 of regions.js
 	// $( ".0-1" ).trigger( "click" );
 	console.log( "Data ready to be transmitted!" );
-	console.log(grids);
+	console.log(JSON.stringify(grids));
 });
 
 $(document).on("click",".jarvis-imaging-1-no",function(){
@@ -482,3 +489,75 @@ $(document).on("click",".jarvis-imaging-2-no",function(){
 	map.disableKeyDragZoom();
 	$('.imaging-area').css('color', '#575757');
 });
+
+uavTracking = false;
+$('.track-uav').click(function() {
+	if( uavTracking ) {
+		$('.track-uav').css('color', '#575757');
+		uavTracking = false;
+		track_uav();
+	}
+	else {
+		$('.track-uav').css('color', '#fff');
+		uavTracking = true;
+	}
+});
+
+
+$(document).ready(function() {
+	refreshRate = 1500;			// In milliseconds.
+	setInterval(function() { 
+					if (uavTracking) {
+						track_uav();
+					}
+				}, refreshRate);
+});
+
+
+flightPlanCoordinates = Array();
+function track_uav() {
+	
+	if (uavTracking) {
+		console.log('tada!' + Math.random());
+		
+		if (typeof uavMarker !== 'undefined') { 
+			uavMarker.setMap(null);
+		}
+		
+		var data = $.ajax({
+					url:  "http://127.0.0.1/uav/gui/uav-location.html?r=" + Math.random(),
+					dataType: "json", 
+					async: false
+				}); // This will wait until you get a response from the ajax request.
+		
+		var location = data.responseText.split(',');
+		location[0] = parseFloat(location[0]);
+		location[1] = parseFloat(location[1]);
+		console.log(location);
+		uavMarker = new google.maps.Marker({
+								position: new google.maps.LatLng(location[0], location[1]),
+								map: map,
+								title: 'UAV'
+						});
+						
+		newPoint  = new google.maps.LatLng(location[0], location[1]);
+		flightPlanCoordinates.push(newPoint);
+		
+		console.log(flightPlanCoordinates);
+		
+		var flightPath = new google.maps.Polyline({
+				path: flightPlanCoordinates,
+				geodesic: true,
+				strokeColor: '#FF0000',
+				strokeOpacity: 1.0,
+				strokeWeight: 1
+		});
+
+		flightPath.setMap(map);				
+		
+		uavMarker.setMap(map);
+	}
+	else {
+		uavMarker.setMap(null);
+	}
+}

@@ -9,12 +9,33 @@
     
     <style type="text/css">
 		/* This hides the line from the graph. */
-		rect {
-			
+		
+		.highcharts-markers .highcharts-tracker {
+			display: none;
 		}
 		
-		g.highcharts-button {
-			
+		.highcharts-axis {
+			display: none;
+		}
+		
+		path {
+			display: none;
+		}
+		
+		.highcharts-tooltip {
+			display: none;
+		}
+		
+		g.highcharts-grid {
+			display: none;
+		}
+		
+		g.highcharts-axis-labels {
+			display: none;
+		}
+		
+		g.highcharts-series {
+			display: none;
 		}
 	</style>
     
@@ -26,7 +47,7 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	
 	<script type="text/javascript">
-		var url = 'http://127.0.0.1/uav/timeline/data.html';
+		var url = 'http://127.0.0.1/uav/gui/timeline/data.html';
 		var data = $.ajax({
 					url:  url,
 					dataType: "json", 
@@ -64,7 +85,8 @@
 		
 		*/
 		
-		$("g").remove(".highcharts-button");
+		//$("g").remove(".highcharts-button");
+		$('text').remove();
 		
 	</script>
 	
