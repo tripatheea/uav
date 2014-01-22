@@ -28,10 +28,10 @@ var coordinateMapType = new CoordMapType();
  */
 
 function initialize() {
-	var minZoomLevel = 8;
+	var minZoomLevel = 7;
 	var myLatlng = new google.maps.LatLng(1.5235, 1.2445);
 	var mapOptions = {
-		zoom: (minZoomLevel - 1),
+		zoom: (minZoomLevel),
 		center: myLatlng,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		tilt: 0,
@@ -41,9 +41,6 @@ function initialize() {
 		}
 	}
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-	
-	
-	
 	
 	// Overlay
 	var imgURL = 'http://www.aashishtripathee.com/wp-content/uploads/2014/01/hyper.png';			
@@ -55,7 +52,7 @@ function initialize() {
 	// new google.maps.LatLng(42.3622, -71.021),
 	// new google.maps.LatLng(42.3122, -71.10843)); 
 	
-	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=2'; 
+	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=3'; 
 	/*
 	var floorBounds = new google.maps.LatLngBounds(
 								new google.maps.LatLng(42.346050, -71.100667),		// South-West
@@ -69,6 +66,9 @@ function initialize() {
 	
 	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
 	floorOverlay.setMap(map);
+	
+	
+	
 	
 	/* 
 	 * The followin is just to bind the custom map to Map.
@@ -119,6 +119,8 @@ function initialize() {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
+
 
 function addOverlay() {
 	historicalOverlay.setMap(map);
@@ -559,5 +561,80 @@ function track_uav() {
 	}
 	else {
 		uavMarker.setMap(null);
+	}
+}
+
+
+
+var UAVMarker;
+function placeMarker(location) {
+  if ( UAVMarker ) {
+	UAVMarker.setMap(map);		// Added later.
+	UAVMarker.setPosition(location);
+  } else {
+	UAVMarker = new google.maps.Marker({
+	  position: location,
+	  map: map
+	});
+  }
+  position = [location['e'], location['d']];
+  start_uav_jarvis(0, position);
+}
+
+listeningToUAVPosition = false;
+$('.start-uav').click(function() {
+	if( listeningToUAVPosition ) {
+		listeningToUAVPosition = false;
+		$('.start-uav').css('color', '#575757');
+		start_uav_jarvis(1, 0);
+	}
+	else {
+		listeningToUAVPosition = true;
+		$('.start-uav').css('color', '#fff');
+	}
+	start_uav();
+});
+
+function start_uav() {
+	if (listeningToUAVPosition) {
+		/* 
+		 * Listen for click to get UAV hover position.
+		 * Listen on the floorplan NOT on the map because the floorplan represents the bounds and the 
+		 * user should not be able to select a region outside these bounds.
+		 */
+		google.maps.event.addListener(floorOverlay, 'click', function(event) {
+														placeMarker(event.latLng);
+													});
+	}
+	else {
+		google.maps.event.clearListeners(floorOverlay, 'click');
+		UAVMarker.setMap(null);
+	}
+}
+
+$(document).on("click",".uav-start-yes",function(){
+	start_uav_jarvis(2, position);
+	console.log(position);
+	// Send a POST request with the location data.
+});
+
+$(document).on("click",".uav-start-no",function(){
+	start_uav_jarvis(1, 0);
+});
+
+function start_uav_jarvis(stage, position) {
+	switch (stage) {
+		
+		case 0:
+		$('.jarvis').html("Coordinates detected: <br>" + position[0] + ", " + position[1] + "<br><br>Are you sure?&nbsp;<span class='confirmation uav-start-yes'>Yes</span>&nbsp;/&nbsp;<span class='confirmation uav-start-no'>No</span>");
+		break;
+		
+		case 1:
+		$('.jarvis').html("");
+		break;
+		
+		case 2:
+		$('.jarvis').html("UAV Dispatched to the following coordinates!<br><br>(" + position[0] + ", " + position[1] + ")");
+		break;
 	}
 }
