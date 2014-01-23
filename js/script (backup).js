@@ -507,7 +507,7 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
+	refreshRate = 1500;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
@@ -520,52 +520,32 @@ flightPlanCoordinates = Array();
 function track_uav() {
 	
 	if (uavTracking) {
-		//console.log('tada!' + Math.random());
+		console.log('tada!' + Math.random());
 		
 		if (typeof uavMarker !== 'undefined') { 
 			uavMarker.setMap(null);
 		}
 		
-		/*
 		var data = $.ajax({
 					url:  "http://127.0.0.1/uav/gui/uav-location.html?r=" + Math.random(),
 					dataType: "json", 
 					async: false
 				}); // This will wait until you get a response from the ajax request.
 		
-		var coords = data.responseText.split(',');
-		coords[0] = parseFloat(coords[0]);
-		coords[1] = parseFloat(coords[1]);
-		
-		*/
-		
-		/* This one's for receiving realtime data from Ben */
-		var url = "http://127.0.0.1/uav/gui/bridge.php";
-
-		var data = $.ajax({
-						url:  url,
-						dataType: "json", 
-						async: false
-					}); // This will wait until you get a response from the ajax request.
-			
-		//var where = data.responseText.replace(/ /g,'');
-		where = data.responseText;
-		there = JSON.parse(where);
-		coords = [there.x, there.y];
-	
-		console.log( coords );
-		
-		
+		var location = data.responseText.split(',');
+		location[0] = parseFloat(location[0]);
+		location[1] = parseFloat(location[1]);
+		console.log(location);
 		uavMarker = new google.maps.Marker({
-								position: new google.maps.LatLng(coords[0], coords[1]),
+								position: new google.maps.LatLng(location[0], location[1]),
 								map: map,
 								title: 'UAV'
 						});
 						
-		newPoint  = new google.maps.LatLng(coords[0], coords[1]);
+		newPoint  = new google.maps.LatLng(location[0], location[1]);
 		flightPlanCoordinates.push(newPoint);
 		
-		//console.log(flightPlanCoordinates);
+		console.log(flightPlanCoordinates);
 		
 		var flightPath = new google.maps.Polyline({
 				path: flightPlanCoordinates,
@@ -585,6 +565,7 @@ function track_uav() {
 }
 
 
+read_vicon_log();
 function read_vicon_log() {
 	//var url = "http://192.168.20.197:8000/sensor_data/position";
 	var url = "http://127.0.0.1/uav/gui/bridge.php";
@@ -599,7 +580,7 @@ function read_vicon_log() {
 	location = JSON.parse(location);
 	coords = [location.x, location.y];
 	
-	console.log( coords );
+	return coords
 	/*
 	log = log.replace(/(\r\n|\n|\r)/gm, '');
 	log = log.replace(/}{/g, '},{');
