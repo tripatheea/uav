@@ -5,7 +5,10 @@
  * 
  */
 
-
+var abc = Object();
+abc['startUAV'] = true;
+abc['coordinates'] = [1.14242413, 2.1351512];
+console.log(JSON.stringify(abc));
 
 function CoordMapType() {
 }
@@ -411,7 +414,7 @@ $('.hyperspectral').click(function() {
 });
 
 draggingEnabled = false;
-$('.water-probe').click(function() {
+$('.imaging-area').click(function() {
 	if( ! draggingEnabled ) {
 		map.enableKeyDragZoom({
 			noZoom: false,
@@ -435,14 +438,8 @@ $('.water-probe').click(function() {
 			nw = [ bnds['fa']['b'], bnds['la']['b'] ];
 			se = [ bnds['fa']['d'], bnds['la']['d'] ];
 			*/
-			
-			/*
 			nw = [ bnds['fa']['b'], bnds['ea']['b'] ];
 			se = [ bnds['fa']['d'], bnds['ea']['d'] ];
-			*/
-			nw = [ bnds['ia']['b'], bnds['ta']['b'] ];
-			se = [ bnds['ia']['d'], bnds['ta']['d'] ];
-			
 			position = [nw, se]
 			//console.log(position);
 			/*
@@ -454,12 +451,12 @@ $('.water-probe').click(function() {
 		});
 
 		draggingEnabled = true;
-		$('.water-probe').css('color', '#fff');
+		$('.imaging-area').css('color', '#fff');
 		$('.jarvis').html(instructions['imaging'][0]);
 	} else {
 		map.disableKeyDragZoom();
 		draggingEnabled = false;
-		$('.water-probe').css('color', '#575757');
+		$('.imaging-area').css('color', '#575757');
 		$('.jarvis').html('');
 	}
 });
@@ -481,39 +478,23 @@ $(document).on("click",".jarvis-imaging-1-yes",function(){
 	// See line ~170 of regions.js
 	// $( ".0-1" ).trigger( "click" );
 	console.log( "Data ready to be transmitted!" );
-	//console.log(JSON.stringify(grids));
+	console.log(JSON.stringify(grids));
 });
 
 $(document).on("click",".jarvis-imaging-1-no",function(){
 	$('.jarvis').html('');
 	map.disableKeyDragZoom();
-	$('.water-probe').css('color', '#575757');
+	$('.imaging-area').css('color', '#575757');
 });
 
 $(document).on("click",".jarvis-imaging-2-yes",function(){
 	$('.jarvis').html(instructions['imaging'][3] + "<br><br>North West Coordinates: " + position[0] + "<br>South East Coordinates: " + position[1]);
-	
-	dataToTransmit = JSON.stringify(grids);
-	
-	url = "http://127.0.0.1/uav/gui/whatever.php";
-	success = function() {
-			console.log("Yay!");
-		}
-		
-	$.ajax({
-		type: "POST",
-		url: url,
-		data: 'points=' + dataToTransmit,
-		success: success,
-		dataType: "jsonp"
-	});
-	//console.log(dataToTransmit);
 });
 
 $(document).on("click",".jarvis-imaging-2-no",function(){
 	$('.jarvis').html('');
 	map.disableKeyDragZoom();
-	$('.water-probe').css('color', '#575757');
+	$('.imaging-area').css('color', '#575757');
 });
 
 uavTracking = false;
@@ -683,8 +664,7 @@ function start_uav() {
 
 $(document).on("click",".uav-start-yes",function(){
 	start_uav_jarvis(2, position);
-	point_to_rectangle(position);
-	//console.log(position);
+	console.log(position);
 	// Send a POST request with the location data.
 });
 
@@ -707,12 +687,4 @@ function start_uav_jarvis(stage, position) {
 		$('.jarvis').html("UAV Dispatched to the following coordinates!<br><br>(" + position[0] + ", " + position[1] + ")");
 		break;
 	}
-}
-
-
-function point_to_rectangle(position) {
-	x = position[0];
-	y = position[1];
-	nw = [x - 1, y + 1];
-	se = [x + 1, y - 1];
 }
