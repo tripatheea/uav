@@ -250,7 +250,7 @@ function show_all_markers() {
 dataHash = '';
 function show_tracking_markers() {	
 
-	var url = 'http://127.0.0.1/uav/php/getMarkers.php';
+	var url = 'http://127.0.0.1/uav/gui/php/getMarkers.php';
 	var data = $.ajax({
 				url:  url,
 				dataType: "json", 
@@ -402,55 +402,27 @@ $('.hyperspectral').click(function() {
 
 
 
-draggingEnabled = false;
+waterSensing = false;
 $('.water-probe').click(function() {
-	if( ! draggingEnabled ) {
-		map.enableKeyDragZoom({
-			noZoom: false,
-			boxStyle: {border: "2px solid #736AFF"},
-			visualEnabled: true,
-			visualPosition: google.maps.ControlPosition.LEFT,
-			visualPositionOffset: new google.maps.Size(35, 0),
-			visualPositionIndex: null,
-			visualSprite: "http://maps.gstatic.com/mapfiles/ftr/controls/dragzoom_btn.png",
-			visualSize: new google.maps.Size(20, 20),
-			visualTips: {
-				 off: "Turn dragging On",
-				 on:  "Turn dragging Off"
-			}
-		});
-		var dz = map.getDragZoomObject();
-
-		google.maps.event.addListener(dz, 'dragend', function(bnds) {
-			
-			/*
-			nw = [ bnds['fa']['b'], bnds['la']['b'] ];
-			se = [ bnds['fa']['d'], bnds['la']['d'] ];
-			*/
-			
-			/*
-			nw = [ bnds['fa']['b'], bnds['ea']['b'] ];
-			se = [ bnds['fa']['d'], bnds['ea']['d'] ];
-			*/
-			nw = [ bnds['ia']['b'], bnds['ta']['b'] ];
-			se = [ bnds['ia']['d'], bnds['ta']['d'] ];
-			
-			position = [nw, se]
-			//console.log(position);
-			/*
-			 *  User has just finished drawing a rectangle.
-			 *  Divide this rectangle into grids and color them and display them.
-			 */
-			draw_grid(position);
-			$('.jarvis').html(instructions['imaging'][1]);
-		});
-
-		draggingEnabled = true;
+	if( ! waterSensing ) {
+		waterSensing = true;
+		
+		// Clear imagingArea thingy.
+		aerialImaging = true;
+		$('.imaging-area').trigger("click");
+		
+		var nw = [ floorBounds['ta']['d'], floorBounds['ta']['b'] ];
+		var se = [ floorBounds['ia']['d'], floorBounds['ia']['b'] ];
+		position = [nw, se];
+		draw_grid(position);
 		$('.water-probe').css('color', '#fff');
-		$('.jarvis').html(instructions['imaging'][0]);
+		$('.jarvis').html(instructions['imaging'][1]);
 	} else {
-		map.disableKeyDragZoom();
-		draggingEnabled = false;
+		waterSensing = false;
+		for (var index in allTiles) {
+			allTiles[index].onRemove();
+		}
+		
 		$('.water-probe').css('color', '#575757');
 		$('.jarvis').html('');
 	}
@@ -733,6 +705,11 @@ $('.imaging-area').click(function() {
 		
 		map.disableKeyDragZoom();
 		
+		// Also, we don't want the screen to have the water sensing UAV grids. So clear that.
+		// To do that set the boolean waterSensing = false and trigger $('.water-probe').click()
+		waterSensing = true;
+		$('.water-probe').trigger("click");
+		
 		$('.imaging-area').css('color', '#fff');
 		aerialImaging = true;
 		
@@ -757,43 +734,30 @@ $('.imaging-area').click(function() {
 			nw = [ bnds['ia']['b'], bnds['ta']['b'] ];
 			se = [ bnds['ia']['d'], bnds['ta']['d'] ];
 			
-			position = [nw, se]
-
-			// We have the position. Construct a new rectangle thing before sending this to TERCIO.
+			position = [nw, se];
 			
-			aerial_imaging_jarvis(0, position);
-			/*
-			oneRect = new Rectangle(position[0], position[1], true, 'A');
+			// Get the floor bounds to see if the user-drawn rectangle is out of bounds.
+			var floorNW = [ floorBounds['ta']['d'], floorBounds['ta']['b'] ];
+			var floorSE = [ floorBounds['ia']['d'], floorBounds['ia']['b'] ];
 			
-			data = new Object();
-			
-			data['width'] = 1;
-			data['height'] = 1;
-			data['points'] = oneRect;
-			
-			data = JSON.stringify(data);
-			
-			// Send a POST request to get this data to TERCIO.
-			url = "http://127.0.0.1/uav/gui/whatever.php";
-			success = function() {
-					console.log("Yay!");
-				}
+			if ((nw[0] < floorNW[0]) || (nw[1] > floorNW[1]) || (se[0] > floorSE[0]) || (se[1] < floorSE[1])){
+				// Out of bounds.
+				aerialImaging = true;
+				$('.imaging-area').trigger("click");
 				
-			$.ajax({
-				type: "POST",
-				url: url,
-				data: 'points=' + data,
-				success: success,
-				dataType: "jsonp"
-			});
-			*/
-
+			}
+			else {
+				// We have the position. Construct a new rectangle thing before sending this to TERCIO.
+				aerial_imaging_jarvis(0, position);
+			}
 		});
 		
 	}
 	else {
 		$('.imaging-area').css('color', '#575757');
 		aerialImaging = false;
+		$('.jarvis').html("");
+		map.disableKeyDragZoom();
 	}
 });
 

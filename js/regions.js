@@ -1,3 +1,5 @@
+allTiles = Object();
+
 function Rectangle(nw, se, selected, name) {
 	this.nw = nw;
 	this.se = se;
@@ -72,7 +74,7 @@ function draw_grid(position) {
 		
 		overlayText = String.fromCharCode(65 + i);
         tile = new tileOverlay(bounds, overlayText, map, index, selected);
-        
+        allTiles[index] = tile;
         grids['points'][index]['name'] = overlayText;
 		
 		i++;

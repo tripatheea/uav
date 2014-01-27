@@ -62,7 +62,7 @@ hyperspectralOverlay.prototype = new google.maps.OverlayView();
 
 /** @constructor */
 function hyperspectralOverlay(bounds, map, index, background) {
-	var opacity = 0.5;
+	var opacity = 0.7;
 	// Initialize all properties.
 	this.bounds_ = bounds;
 	this.background_ = background;
