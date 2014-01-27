@@ -31,7 +31,7 @@ var coordinateMapType = new CoordMapType();
 
 function initialize() {
 	var minZoomLevel = 7;
-	var myLatlng = new google.maps.LatLng(2.44480038, 1.82611289);
+	var myLatlng = new google.maps.LatLng(1.5235, 1.2445);
 	var mapOptions = {
 		zoom: (minZoomLevel),
 		center: myLatlng,
@@ -44,8 +44,13 @@ function initialize() {
 	}
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 	
-	
-
+	// Overlay
+	var imgURL = 'http://www.aashishtripathee.com/wp-content/uploads/2014/01/hyper.png';			
+	var imageBounds = new google.maps.LatLngBounds(
+							  new google.maps.LatLng(42.3481, -71.1060),
+							  new google.maps.LatLng(42.3605, -71.0835)
+						);
+	historicalOverlay = new google.maps.GroundOverlay(imgURL, imageBounds);
 	// new google.maps.LatLng(42.3622, -71.021),
 	// new google.maps.LatLng(42.3122, -71.10843)); 
 	
@@ -56,9 +61,9 @@ function initialize() {
 								new google.maps.LatLng(42.361895, -71.06895)		// North-East
 						);
 	*/
-	floorBounds = new google.maps.LatLngBounds(
-								new google.maps.LatLng(0, 0),										// South-West
-								new google.maps.LatLng(4.889600753195714, 3.6522257702209595)		// North-East
+	var floorBounds = new google.maps.LatLngBounds(
+								new google.maps.LatLng(0, 0),		// South-West
+								new google.maps.LatLng(3.047, 2.489)		// North-East
 						);
 	
 	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
@@ -119,7 +124,13 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 
 
+function addOverlay() {
+	historicalOverlay.setMap(map);
+}
 
+function removeOverlay() {
+  historicalOverlay.setMap(null);
+}
 		
 				
 function show_cholorophyll() {
@@ -389,18 +400,15 @@ $('.tracking').click(function() {
 spectral = false;;
 $('.hyperspectral').click(function() {
 	if( ! spectral ) {
-		show_hyperspectral();
+		addOverlay();
 		spectral = true;
 		$('.hyperspectral').css('color', '#fff');
 	} else {
-		remove_hyperspectral();
+		removeOverlay();
 		spectral = false;
 		$('.hyperspectral').css('color', '#575757');
 	}
 });
-
-
-
 
 draggingEnabled = false;
 $('.water-probe').click(function() {
@@ -532,35 +540,6 @@ $(document).ready(function() {
 });
 
 
-$(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
-	setInterval(function() { 
-					if (uavTracking) {
-						sensor_reading();
-					}
-				}, refreshRate);
-});
-
-
-
-
-function sensor_reading() {
-	var url = "http://127.0.0.1/uav/gui/bridge-sensor.php";
-
-		var data = $.ajax({
-						url:  url,
-						dataType: "json", 
-						async: false
-					}); // This will wait until you get a response from the ajax request.
-		
-		data = data.responseText;
-		//data = JSON.parse(data);
-		$('.sensor-reading').html(data);
-}
-
-
-
-
 flightPlanCoordinates = Array();
 function track_uav() {
 	
@@ -571,6 +550,19 @@ function track_uav() {
 			uavMarker.setMap(null);
 		}
 		
+		/*
+		var data = $.ajax({
+					url:  "http://127.0.0.1/uav/gui/uav-location.html?r=" + Math.random(),
+					dataType: "json", 
+					async: false
+				}); // This will wait until you get a response from the ajax request.
+		
+		var coords = data.responseText.split(',');
+		coords[0] = parseFloat(coords[0]);
+		coords[1] = parseFloat(coords[1]);
+		
+		*/
+		
 		/* This one's for receiving realtime data from Ben */
 		var url = "http://127.0.0.1/uav/gui/bridge.php";
 
@@ -579,11 +571,11 @@ function track_uav() {
 						dataType: "json", 
 						async: false
 					}); // This will wait until you get a response from the ajax request.
-		
+			
+		//var where = data.responseText.replace(/ /g,'');
 		where = data.responseText;
 		there = JSON.parse(where);
-		
-		coords = [there.translation.x, there.translation.y];
+		coords = [there.x, there.y];
 	
 		console.log( coords );
 		
@@ -723,128 +715,4 @@ function point_to_rectangle(position) {
 	y = position[1];
 	nw = [x - 1, y + 1];
 	se = [x + 1, y - 1];
-}
-
-aerialImaging = false;
-$('.imaging-area').click(function() {
-	if ( ! aerialImaging ) {
-		
-		// TO DO: Need to erase all other drawings of rectangle before drawing a new one.
-		
-		map.disableKeyDragZoom();
-		
-		$('.imaging-area').css('color', '#fff');
-		aerialImaging = true;
-		
-		// Trigger an event to enable the user to drag a rectangle within the bounds.
-		map.enableKeyDragZoom({
-			noZoom: false,
-			boxStyle: {border: "2px solid #736AFF"},
-			visualEnabled: true,
-			visualPosition: google.maps.ControlPosition.LEFT,
-			visualPositionOffset: new google.maps.Size(35, 0),
-			visualPositionIndex: null,
-			visualSprite: "http://maps.gstatic.com/mapfiles/ftr/controls/dragzoom_btn.png",
-			visualSize: new google.maps.Size(20, 20),
-			visualTips: {
-				 off: "Turn dragging On",
-				 on:  "Turn dragging Off"
-			}
-		});
-		var dz = map.getDragZoomObject();
-
-		google.maps.event.addListener(dz, 'dragend', function(bnds) {
-			nw = [ bnds['ia']['b'], bnds['ta']['b'] ];
-			se = [ bnds['ia']['d'], bnds['ta']['d'] ];
-			
-			position = [nw, se]
-
-			// We have the position. Construct a new rectangle thing before sending this to TERCIO.
-			
-			aerial_imaging_jarvis(0, position);
-			/*
-			oneRect = new Rectangle(position[0], position[1], true, 'A');
-			
-			data = new Object();
-			
-			data['width'] = 1;
-			data['height'] = 1;
-			data['points'] = oneRect;
-			
-			data = JSON.stringify(data);
-			
-			// Send a POST request to get this data to TERCIO.
-			url = "http://127.0.0.1/uav/gui/whatever.php";
-			success = function() {
-					console.log("Yay!");
-				}
-				
-			$.ajax({
-				type: "POST",
-				url: url,
-				data: 'points=' + data,
-				success: success,
-				dataType: "jsonp"
-			});
-			*/
-
-		});
-		
-	}
-	else {
-		$('.imaging-area').css('color', '#575757');
-		aerialImaging = false;
-	}
-});
-
-
-$(document).on("click",".aerial-imaging-yes",function(){
-	oneRect = new Rectangle(position[0], position[1], true, 'A');
-			
-	data = new Object();
-	
-	data['width'] = 1;
-	data['height'] = 1;
-	data['points'] = oneRect;
-	
-	data = JSON.stringify(data);
-	
-	// Send a POST request to get this data to TERCIO.
-	url = "http://127.0.0.1/uav/gui/whatever.php";
-	success = function() {
-			//console.log("Yay!");
-			//aerial_imaging_jarvis(2, position);
-		}
-		
-	$.ajax({
-		type: "POST",
-		url: url,
-		data: 'points=' + data,
-		success: success,
-		dataType: "jsonp"
-	});
-	
-	console.log("Yay!");
-	aerial_imaging_jarvis(2, position);
-});
-
-$(document).on("click",".aerial-imaging-no",function(){
-	aerial_imaging_jarvis(1, position);
-});
-
-function aerial_imaging_jarvis(stage, position) {
-	switch (stage) {
-		
-		case 0:
-		$('.jarvis').html("Coordinates detected: <br>" + position[0] + ", " + position[1] + "<br><br>Are you sure?&nbsp;<span class='confirmation aerial-imaging-yes'>Yes</span>&nbsp;/&nbsp;<span class='confirmation aerial-imaging-no'>No</span>");
-		break;
-		
-		case 1:
-		$('.jarvis').html("");
-		break;
-		
-		case 2:
-		$('.jarvis').html("UAV Dispatched to the following coordinates!<br><br>(" + position[0] + ", " + position[1] + ")");
-		break;
-	}
 }

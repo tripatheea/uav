@@ -1,22 +1,16 @@
 <?php
 	
+	// This one's for sending POST requests with the selection (grid) data
+	// to the Bwingle server so that Evie can query that one.
+	
 	$data = $_POST['points'];
 	//$data = json_encode($data);
 	//$data = json_decode($data);
-	
-	
 
 	$url = 'http://www.bwingle.org/scl/';
 	
-	
-	/*
-	$data = get_object_vars($data);
-
-	
-	$myvars = http_build_query($data) . "\n";
-	$myvars = http_build_query($data, '', '&amp;');
-	*/
-	$myvars = array('points' => $data);
+	//$myvars = array('points' => $data);
+	$myvars = array('points' => $data, 'api_key' => '6175007565');
 	
 	$ch = curl_init( $url );
 	curl_setopt( $ch, CURLOPT_POST, 1);
