@@ -86,8 +86,12 @@
 						async: false
 					}); // This will wait until you get a response from the ajax request.
 			
+			
 			list = data.responseText.split(';');
 			newData = list[0];
+			
+			console.log(newData + ' = ' + timestamp);
+			
 			if(newData != timestamp) {
 				timestamp = newData;
 				console.log('New ones!');
@@ -147,11 +151,7 @@
 				var nw = [ tile['coordinates']['nw'][0]/3600, tile['coordinates']['nw'][1]/3600 ]; 
 				var se = [ tile['coordinates']['se'][0]/3600, tile['coordinates']['se'][1]/3600 ]; 
 				
-				/*
-				Shouldn't the order below be:
-					se[0], nw[1],
-					nw[0], se[1]
-				*/
+
 				var imgURL = tile['path'];
 				var imageBounds = new google.maps.LatLngBounds(
 										  new google.maps.LatLng(se[0], nw[1]),
@@ -191,10 +191,11 @@
 		$(document).ready(function() {
 			window.setInterval(function() {
 						console.log(new_data_to_fetch());
-									if( new_data_to_fetch() ) {
+									//if( new_data_to_fetch() ) {
+									if(true) {
 										overlay_magic();
 									}
-								} , 5000);
+								} , 1000);
 		});
 	</script>
 

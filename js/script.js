@@ -56,6 +56,8 @@ function initialize() {
 								new google.maps.LatLng(42.361895, -71.06895)		// North-East
 						);
 	*/
+	
+	// x and y are flipped here.
 	floorBounds = new google.maps.LatLngBounds(
 								new google.maps.LatLng(0, 0),										// South-West
 								new google.maps.LatLng(4.889600753195714, 3.6522257702209595)		// North-East
@@ -495,7 +497,7 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
+	refreshRate = 250;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
@@ -503,20 +505,22 @@ $(document).ready(function() {
 				}, refreshRate);
 });
 
+// UAV Tracking itself calls sensor reading. So no need of this.
 
+/*
 $(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
+	refreshRate = 1500;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						sensor_reading();
 					}
 				}, refreshRate);
 });
+*/
 
 
 
-
-function sensor_reading() {
+function sensor_reading(coords) {
 	var url = "http://127.0.0.1/uav/gui/bridge-sensor.php";
 
 		var data = $.ajax({
@@ -525,9 +529,36 @@ function sensor_reading() {
 						async: false
 					}); // This will wait until you get a response from the ajax request.
 		
-		data = data.responseText;
+		sensorReading = data.responseText;
+		sensorReading = JSON.parse(sensorReading);
+		sensorReading = sensorReading['channel'][7];
+		
+		// This gets new coords
+		/*
+		var url = "http://127.0.0.1/uav/gui/bridge.php";
+
+		var data = $.ajax({
+						url:  url,
+						dataType: "json", 
+						async: false
+					}); // This will wait until you get a response from the ajax request.
+		
+		where = data.responseText;
+		there = JSON.parse(where);
+		
+		coords = [there.translation.x, there.translation.y];
+		*/
+		
+		tileCoords = point_to_tile(coords);
+		tileCoords = tileCoords[0] + "," + tileCoords[1];
+		
 		//data = JSON.parse(data);
-		$('.sensor-reading').html(data);
+		$('.sensor-reading').html(sensorReading);
+		var color = 'rgb(' + sensorReading + ', 0, 0)';
+		
+		//min = 0; max = 255; var color = 'rgb(' + sensorReading + ', ' + (Math.floor(Math.random() * (max - min + 1)) + min) + ', ' + (Math.floor(Math.random() * (max - min + 1)) + min) + ')';
+		//console.log(color);
+		color_tile(tileCoords, color);
 }
 
 
@@ -539,9 +570,7 @@ function track_uav() {
 	if (uavTracking) {
 		//console.log('tada!' + Math.random());
 		
-		if (typeof uavMarker !== 'undefined') { 
-			uavMarker.setMap(null);
-		}
+		
 		
 		/* This one's for receiving realtime data from Ben */
 		var url = "http://127.0.0.1/uav/gui/bridge.php";
@@ -555,21 +584,35 @@ function track_uav() {
 		where = data.responseText;
 		there = JSON.parse(where);
 		
-		coords = [there.translation.x, there.translation.y];
-	
-		console.log( coords );
+		there = there.transform;
 		
+		coords = [there.translation.x, there.translation.y];
+		
+		console.log( [there.translation.x, there.translation.y, there.translation.z] );
+		
+		// We have the altitude as there.translation.z
+		// Check if it's below a certain cutoff and color the tile only if the z-value is less than a certain value.
+		altitudeCutoff = 1;
+		if ( there.translation.z < altitudeCutoff ) {
+			//console.log("Coloring...");
+			sensor_reading(coords);
+		}
+		if (typeof uavMarker !== 'undefined') {
+			uavMarker.setMap(null);
+		}
+		
+		// Color the tile as well.
+		// Not totally sure about the ordering. Do a trial run in Holodeck to confirm.
 		
 		uavMarker = new google.maps.Marker({
-								position: new google.maps.LatLng(coords[0], coords[1]),
+								position: new google.maps.LatLng(coords[1], coords[0]),		// The ordering is 1, 0. This is NOT a mistake.
 								map: map,
-								title: 'UAV'
+								title: 'UAV',
+								icon: 'http://127.0.0.1/uav/gui/images/icon.png'
 						});
 						
-		newPoint  = new google.maps.LatLng(coords[0], coords[1]);
+		newPoint  = new google.maps.LatLng(coords[1], coords[0]);						// The ordering is 1, 0. This is NOT a mistake.
 		flightPlanCoordinates.push(newPoint);
-		
-		//console.log(flightPlanCoordinates);
 		
 		var flightPath = new google.maps.Polyline({
 				path: flightPlanCoordinates,
@@ -578,9 +621,8 @@ function track_uav() {
 				strokeOpacity: 1.0,
 				strokeWeight: 1
 		});
-
-		flightPath.setMap(map);				
 		
+		flightPath.setMap(map);
 		uavMarker.setMap(map);
 	}
 	else {
@@ -602,16 +644,6 @@ function read_vicon_log() {
 	var location = data.responseText.replace(/ /g,'');
 	location = JSON.parse(location);
 	coords = [location.x, location.y];
-	
-	console.log( coords );
-	/*
-	log = log.replace(/(\r\n|\n|\r)/gm, '');
-	log = log.replace(/}{/g, '},{');
-	log = '{"positions": [' + log + ']}';
-	json = JSON.stringify(eval("(" + log + ")"));
-	log = JSON.parse(json);
-	console.log(log);
-	*/
 }
 
 

@@ -18,8 +18,8 @@ function divide_into_grids(rect, division) {
 	xDivision = division[0];
 	yDivision = division[1];
 	
-	var gridWidth = width/xDivision;
-	var gridHeight = height/yDivision;
+	gridWidth = width/xDivision;
+	gridHeight = height/yDivision;
 	
 	
 	grids2 = Object();
@@ -107,12 +107,14 @@ function flash_tile(commaIndex) {
 	var hyphenIndex = hyphenIndex[0] + '-' + hyphenIndex[1];
 	var selector = "." + hyphenIndex;
 	
-	grids[commaIndex]['action'] = Array('flash');
+	grids['points'][commaIndex]['action'] = Array('flash');
 	
 	setInterval( function(){
 					$(selector).trigger( "click" );
 				}, 500);
 }
+
+
 
 
 function autonomous_select(commaIndex) {
@@ -268,6 +270,17 @@ tileOverlay.prototype.onAdd = function() {
 				if (action.indexOf('autonomous_select') > -1) {
 					div.style.background = 'rgb(0, 224, 0)';
 					div.style.color = 'rgb(254, 254, 254)';
+				}
+				
+				action = action[0].split("|");
+				if(action.length == 2) {
+					if(action[0] == "color") {
+						//console.log("Coloring...");
+						div.style.background = action[1];
+						//console.log("Color: " + action[1]);
+						div.style.color = 'rgb(123, 214, 11)';
+						grids['points'][index]['selected'] = true;
+					}
 				}
 				
 			});

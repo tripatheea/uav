@@ -19,8 +19,8 @@ function generate_random_image_array(x, y) {
 
 
 function show_hyperspectral() {
-	arrayWidth = 50;
-	arrayHeight = 50;
+	arrayWidth = 60;
+	arrayHeight = 60;
 	
 	var nw = [ floorBounds['ta']['d'], floorBounds['ta']['b'] ];
 	var se = [ floorBounds['ia']['d'], floorBounds['ia']['b'] ];

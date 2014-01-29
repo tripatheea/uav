@@ -2,6 +2,7 @@
 	// This one's for receiving UAV position and sensor data from Ben's server.
 
 	$url = "http://192.168.20.197:8000/vicon/UAV_2";
+	//$url = "http://127.0.0.1/uav/gui/sensor-demo/position.php";
 	
 	/* gets the data from a URL */
 	function get_data($url) {
