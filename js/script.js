@@ -497,7 +497,7 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 250;			// In milliseconds.
+	refreshRate = 100;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
