@@ -473,6 +473,8 @@ $(document).on("click",".jarvis-imaging-2-yes",function(){
 		success: success,
 		dataType: "jsonp"
 	});
+	
+	mark_grids_human_autonomous();
 	//console.log(dataToTransmit);
 });
 
@@ -549,16 +551,14 @@ function sensor_reading(coords) {
 		coords = [there.translation.x, there.translation.y];
 		*/
 		
-		tileCoords = point_to_tile(coords);
-		tileCoords = tileCoords[0] + "," + tileCoords[1];
 		
-		//data = JSON.parse(data);
 		$('.sensor-reading').html(sensorReading);
-		var color = 'rgb(' + sensorReading + ', 0, 0)';
 		
-		//min = 0; max = 255; var color = 'rgb(' + sensorReading + ', ' + (Math.floor(Math.random() * (max - min + 1)) + min) + ', ' + (Math.floor(Math.random() * (max - min + 1)) + min) + ')';
-		//console.log(color);
-		color_tile(tileCoords, color);
+		if (typeof grids !== 'undefined') {
+			water_sensing_color_tile(coords);	// Color the tiles.
+		}
+		
+		sensor_reading_to_circles(coords, sensorReading); // Show circles.
 }
 
 

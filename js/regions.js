@@ -21,7 +21,6 @@ function divide_into_grids(rect, division) {
 	gridWidth = width/xDivision;
 	gridHeight = height/yDivision;
 	
-	
 	grids2 = Object();
 	for (var i = 0; i < xDivision; i++) {	// Changes longitude.
 		for (var j = 0; j < yDivision; j++ ) {	// Changes latitude.
@@ -136,6 +135,22 @@ function autonomous_select(commaIndex) {
 
 
 
+function mark_grids_human_autonomous() {
+	var human = "H";
+	var autonomous = "A";
+	for (index in grids['points']) {
+		var label = 'A';
+		if (grids['points'][index]['selected']) {
+			label = 'H';
+		}
+		grids['points'][index]['action'] = Array('relabel', label);
+		var brokenIndex = index.split(",");
+		var selector = "." + brokenIndex[0] + "-" + brokenIndex[1];
+		$(selector).trigger( "click" );
+	}
+}
+
+
 /* Custom overlay code */
 
 var overlay;
@@ -175,7 +190,7 @@ tileOverlay.prototype.onAdd = function() {
 	div.style.textAlign = 'center';
 	div.style.verticalAlign = 'middle';
 	div.style.margin = '0';
-	div.style.opacity = '0.6';
+	div.style.opacity = '0.3';
 	div.style.fontSize = '1.5em';
 	div.style.fontWeight = '900';
 	div.style.cursor = 'pointer';
@@ -272,16 +287,30 @@ tileOverlay.prototype.onAdd = function() {
 					div.style.color = 'rgb(254, 254, 254)';
 				}
 				
-				action = action[0].split("|");
+				//action = action[0].split("|");
 				if(action.length == 2) {
 					if(action[0] == "color") {
 						//console.log("Coloring...");
-						div.style.background = action[1];
+						//div.style.background = action[1];
+						div.style.background = 'rgb(255, 255, 255)';
 						//console.log("Color: " + action[1]);
 						div.style.color = 'rgb(123, 214, 11)';
 						grids['points'][index]['selected'] = true;
 					}
+					else if (action[0] == "relabel") {
+						//div.innerHTML = action[1];
+						div.innerHTML = "";
+						if (action[1] == 'A') { 
+							div.style.background = 'rgb(100, 100, 200)';
+						}
+						else {
+							div.style.background = 'rgb(35, 156, 152)';
+						}
+					}
 				}
+				
+				
+				
 				
 			});
 			

@@ -1,3 +1,21 @@
+function water_sensing_color_tile(coords) {
+	
+	var tileCoords = point_to_tile(coords);
+	var color = 'rgb(' + sensorReading + ', 0, 0)';
+	
+	var hyphenIndex = tileCoords[0] + '-' + tileCoords[1];
+	var commaIndex = tileCoords[0] + ',' + tileCoords[1];
+	var selector = "." + hyphenIndex;
+	
+	var arg = 'color|' + color;
+	grids['points'][commaIndex]['action'] = Array('color', color);
+	$(selector).trigger( "click" );
+	
+	
+}
+
+/*
+
 function color_tile(commaIndex, color) {
 	
 	// Use this to trigger a sort of warning about a particular tile.
@@ -10,11 +28,36 @@ function color_tile(commaIndex, color) {
 	
 	var arg = 'color|' + color;
 	grids['points'][commaIndex]['action'] = Array(arg);
-	$(selector).trigger( "click" );
-	
-	
+	$(selector).trigger( "click" );	
 }
+* 
+*/
 
+function sensor_reading_to_circles(position, reading) {	//position, color
+	
+	var circle = {};
+	circle = {
+		center: new google.maps.LatLng(position[1], position[0]),
+		value: reading
+	};
+	
+
+	var color = 'rgb(0, ' + sensorReading + ', 0)';
+	
+	var circleOptions = {
+		strokeColor: '#000000',
+		strokeOpacity: 0.8,
+		strokeWeight: 1,
+		fillColor: color,
+		fillOpacity: 0.7,
+		zIndex: 999,
+		map: map,
+		center: circle.center,
+		radius: circle.value * 200
+	};
+	// Add the circle for this city to the map.
+	sensorCircle = new google.maps.Circle(circleOptions);
+}
 
 
 function point_to_tile(point) {

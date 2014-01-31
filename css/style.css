@@ -56,3 +56,12 @@ textarea.log {
 	font-size: 11px;
 }
 
+.slider {
+	margin: 30px 0 0 0;
+}
+
+.selected-value {
+	font-size: 0.9em;
+	font-weight: bold;
+	margin: 20px 0 0 0;
+}
