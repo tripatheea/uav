@@ -461,7 +461,7 @@ $(document).on("click",".jarvis-imaging-2-yes",function(){
 	
 	dataToTransmit = JSON.stringify(grids);
 	
-	url = "http://127.0.0.1/uav/gui/whatever.php";
+	url = "http://127.0.0.1/uav/gui/tercio.php";
 	success = function() {
 			console.log("Yay!");
 		}
@@ -499,7 +499,7 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
+	refreshRate = 1500;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
@@ -631,22 +631,6 @@ function track_uav() {
 }
 
 
-function read_vicon_log() {
-	//var url = "http://192.168.20.197:8000/sensor_data/position";
-	var url = "http://127.0.0.1/uav/gui/bridge.php";
-
-	var data = $.ajax({
-					url:  url,
-					dataType: "json", 
-					async: false
-				}); // This will wait until you get a response from the ajax request.
-		
-	var location = data.responseText.replace(/ /g,'');
-	location = JSON.parse(location);
-	coords = [location.x, location.y];
-}
-
-
 var UAVMarker;
 function placeMarker(location) {
   if ( UAVMarker ) {
@@ -695,9 +679,25 @@ function start_uav() {
 
 $(document).on("click",".uav-start-yes",function(){
 	start_uav_jarvis(2, position);
-	point_to_rectangle(position);
-	//console.log(position);
+	
+	console.log("Starting UAV " + position);
+	
 	// Send a POST request with the location data.
+	
+	data = Object();
+	data['waypoints'] = position;
+	data = JSON.stringify(data);
+	
+	// Send a POST request to get this data to TERCIO.
+	url = "http://127.0.0.1/uav/gui/start-uav.php";
+	success = function() { }
+	$.ajax({
+		type: "POST",
+		url: url,
+		data: 'data=' + data,
+		success: success,
+		dataType: "jsonp"
+	});
 });
 
 $(document).on("click",".uav-start-no",function(){
@@ -806,7 +806,7 @@ $(document).on("click",".aerial-imaging-yes",function(){
 	data = JSON.stringify(data);
 	
 	// Send a POST request to get this data to TERCIO.
-	url = "http://127.0.0.1/uav/gui/whatever.php";
+	url = "http://127.0.0.1/uav/gui/tercio.php";
 	success = function() {
 			//console.log("Yay!");
 			//aerial_imaging_jarvis(2, position);

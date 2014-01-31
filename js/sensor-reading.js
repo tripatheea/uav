@@ -53,7 +53,7 @@ function sensor_reading_to_circles(position, reading) {	//position, color
 		zIndex: 999,
 		map: map,
 		center: circle.center,
-		radius: circle.value * 200
+		radius: circle.value * 50
 	};
 	// Add the circle for this city to the map.
 	sensorCircle = new google.maps.Circle(circleOptions);
