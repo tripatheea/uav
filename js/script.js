@@ -374,16 +374,16 @@ $('.tracking').click(function() {
 	}
 });
 
-spectral = false;;
-$('.hyperspectral').click(function() {
-	if( ! spectral ) {
-		show_hyperspectral();
-		spectral = true;
-		$('.hyperspectral').css('color', '#fff');
+heatmaps = false;;
+$('.heatmaps').click(function() {
+	if( ! heatmaps ) {
+		show_heatmaps();
+		heatmaps = true;
+		$('.heatmaps').css('color', '#fff');
 	} else {
-		remove_hyperspectral();
-		spectral = false;
-		$('.hyperspectral').css('color', '#575757');
+		remove_heatmaps();
+		heatmaps = false;
+		$('.heatmaps').css('color', '#575757');
 	}
 });
 
@@ -486,7 +486,7 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 0;			// In milliseconds.
+	refreshRate = 100;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
@@ -495,46 +495,48 @@ $(document).ready(function() {
 				}, refreshRate);
 });
 
-
+count = 0;
 function sensor_reading(coords) {
+	count++;
+	console.log(count);
+	
 	var url = "http://127.0.0.1/uav/gui/bridge-sensor.php";
 
-		var data = $.ajax({
-						url:  url,
-						dataType: "json", 
-						async: false
-					}); // This will wait until you get a response from the ajax request.
-		
-		sensorReading = data.responseText;
-		sensorReading = JSON.parse(sensorReading);
-		sensorReading = sensorReading['channel'][7];
-		
-		// This gets new coords
-		/*
-		var url = "http://127.0.0.1/uav/gui/bridge.php";
+	var data = $.ajax({
+					url:  url,
+					dataType: "json", 
+					async: false
+				}); // This will wait until you get a response from the ajax request.
+	
+	sensorReading = data.responseText;
+	sensorReading = JSON.parse(sensorReading);
+	sensorReading = sensorReading['channel'][7];
+	
+	// This gets new coords
+	/*
+	var url = "http://127.0.0.1/uav/gui/bridge.php";
 
-		var data = $.ajax({
-						url:  url,
-						dataType: "json", 
-						async: false
-					}); // This will wait until you get a response from the ajax request.
-		
-		where = data.responseText;
-		there = JSON.parse(where);
-		
-		coords = [there.translation.x, there.translation.y];
-		*/
-		
-		
-		$('.sensor-reading').html(sensorReading);
-		
-		if (typeof grids !== 'undefined') {
-			water_sensing_color_tile(coords);	// Color the tiles.
-		}
-		
-		sensor_reading_to_circles(coords, sensorReading); // Show circles.
+	var data = $.ajax({
+					url:  url,
+					dataType: "json", 
+					async: false
+				}); // This will wait until you get a response from the ajax request.
+	
+	where = data.responseText;
+	there = JSON.parse(where);
+	
+	coords = [there.translation.x, there.translation.y];
+	*/
+	
+	
+	$('.sensor-reading').html(sensorReading);
+	
+	if (typeof grids !== 'undefined') {
+		water_sensing_color_tile(coords);	// Color the tiles.
+	}
+	
+	sensor_reading_to_circles(coords, sensorReading); // Show circles.
 }
-
 
 
 
@@ -543,7 +545,6 @@ function track_uav() {
 	
 	if (uavTracking) {
 		//console.log('tada!' + Math.random());
-		
 		
 		
 		/* This one's for receiving realtime data from Ben */
@@ -562,7 +563,7 @@ function track_uav() {
 		
 		coords = [there.translation.x, there.translation.y];
 		
-		console.log( [there.translation.x, there.translation.y, there.translation.z] );
+		//console.log( [there.translation.x, there.translation.y, there.translation.z] );
 		
 		// We have the altitude as there.translation.z
 		// Check if it's below a certain cutoff and color the tile only if the z-value is less than a certain value.

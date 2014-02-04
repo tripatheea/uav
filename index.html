@@ -15,7 +15,7 @@
 		<div class="row">
 			
 			<div class="col-md-1 data-types">
-				<div class="row hyperspectral">Heatmaps</div>
+				<div class="row heatmaps">Heatmaps</div>
 				<div class="row chloro">Chlorophyll</div>
 				<div class="row phy">Phycocyanin</div>
 				<div class="row abc">Nitrogen</div>
@@ -24,7 +24,7 @@
 				<div class="row abc">Dissolved Oxygen</div>
 				<div class="row abc">pH</div>
 				<div class="row tracking">Tracking</div>
-				<div class="row show-aerial-images">Show Aerial Images</div>
+				<div class="row show-aerial-images">Hyperspectral Imaging</div>
 				
 			</div><!--/.data-types -->
 			
@@ -81,7 +81,7 @@
 	
 	<script type="text/javascript" src="js/script.js"></script>
 	<script type="text/javascript" src="js/regions.js"></script>
-	<script type="text/javascript" src="js/hyperspectral.js"></script>
+	<script type="text/javascript" src="js/heatmaps.js"></script>
 	<script type="text/javascript" src="js/sensor-reading.js"></script>
 	
 	<script>
@@ -99,7 +99,7 @@
 								var date = new Date (timestamp);
 								var value = date.getDate() + " " + monthNames[date.getMonth()] + ", " + date.getFullYear();
 								$('.selected-value').html(value);
-								if (spectral) {
+								if (heatmaps) {
 									show_gaussian_plot(date.getDate());
 								}
 							}
