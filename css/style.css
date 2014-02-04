@@ -65,3 +65,15 @@ textarea.log {
 	font-weight: bold;
 	margin: 20px 0 0 0;
 }
+
+a.big-red-button-uav-throttle {
+	color: #575757;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+a.big-red-button-uav-throttle:hover {
+	text-decoration: none;
+	color: #fff;
+	cursor: pointer;
+}

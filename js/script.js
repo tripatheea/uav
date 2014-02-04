@@ -44,30 +44,16 @@ function initialize() {
 	}
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 	
-	
-
-	// new google.maps.LatLng(42.3622, -71.021),
-	// new google.maps.LatLng(42.3122, -71.10843)); 
-	
 	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=3'; 
-	/*
-	var floorBounds = new google.maps.LatLngBounds(
-								new google.maps.LatLng(42.346050, -71.100667),		// South-West
-								new google.maps.LatLng(42.361895, -71.06895)		// North-East
-						);
-	*/
 	
 	// x and y are flipped here.
 	floorBounds = new google.maps.LatLngBounds(
-								new google.maps.LatLng(0, 0),										// South-West
-								new google.maps.LatLng(4.889600753195714, 3.6522257702209595)		// North-East
+								new google.maps.LatLng(0, 0),												// South-West
+								new google.maps.LatLng(4.889600753195714, 3.6522257702209595)				// North-East
 						);
 	
 	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
 	floorOverlay.setMap(map);
-	
-	
-	
 	
 	/* 
 	 * The followin is just to bind the custom map to Map.
@@ -414,7 +400,7 @@ $('.water-probe').click(function() {
 		$('.imaging-area').trigger("click");
 		
 		var nw = [ floorBounds['ta']['d'], floorBounds['ta']['b'] ];
-		var se = [ floorBounds['ia']['d'], floorBounds['ia']['b'] ];
+		var se = [ floorBounds['ga']['d'], floorBounds['ga']['b'] ];
 		position = [nw, se];
 		draw_grid(position);
 		$('.water-probe').css('color', '#fff');
@@ -471,7 +457,8 @@ $(document).on("click",".jarvis-imaging-2-yes",function(){
 		url: url,
 		data: 'points=' + dataToTransmit,
 		success: success,
-		dataType: "jsonp"
+		dataType: "json",
+		async: true
 	});
 	
 	mark_grids_human_autonomous();
@@ -499,27 +486,14 @@ $('.track-uav').click(function() {
 
 
 $(document).ready(function() {
-	refreshRate = 1500;			// In milliseconds.
+	refreshRate = 0;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
+						// track_uav() in-turn calls sensor_reading.
 					}
 				}, refreshRate);
 });
-
-// UAV Tracking itself calls sensor reading. So no need of this.
-
-/*
-$(document).ready(function() {
-	refreshRate = 1500;			// In milliseconds.
-	setInterval(function() { 
-					if (uavTracking) {
-						sensor_reading();
-					}
-				}, refreshRate);
-});
-*/
-
 
 
 function sensor_reading(coords) {
@@ -660,6 +634,58 @@ $('.start-uav').click(function() {
 	start_uav();
 });
 
+
+startUAVThrottle = false;
+$('.start-uav-throttle').click(function() {
+	if( ! startUAVThrottle ) {
+		$('.start-uav-throttle').css('color', '#fff');
+		start_uav_throttle_jarvis(0);
+		startUAVThrottle = true;
+	}
+	else {
+		startUAVThrottle = false;
+		$('.start-uav-throttle').css('color', '#575757');
+		start_uav_throttle_jarvis(-1);
+	}
+});
+
+function start_uav_throttle_jarvis(level) {
+	switch(level) {
+		case 0:
+		$('.jarvis').html("Please enter a throttle amount.<br><br><input type='number' class='throttle-value' value='1000' min='1000' max='1100' style='width: 45px;'>&nbsp;&nbsp;&nbsp;<a class='big-red-button-uav-throttle'>Start</a>");
+		break;
+		
+		case 1:
+		$('.jarvis').html("UAV successfully dispatched!");
+		break;
+		
+		case -1:
+		$('.jarvis').html("");
+		break;
+
+	}
+}
+
+$(document).on("click", ".big-red-button-uav-throttle", function() {
+	var throttle = $('.throttle-value').val();
+	
+	data = Object();
+	data['throttle'] = throttle;
+	
+	// Send a POST request to get this data to TERCIO.
+	url = "http://127.0.0.1/uav/gui/start-uav-throttle.php";
+	$.ajax({
+		type: "POST",
+		url: url,
+		data: data,
+		success: start_uav_throttle_jarvis(1),
+		async: true,
+		dataType: "json"
+	});
+	
+});
+
+
 function start_uav() {
 	if (listeningToUAVPosition) {
 		/* 
@@ -677,7 +703,7 @@ function start_uav() {
 	}
 }
 
-$(document).on("click",".uav-start-yes",function(){
+$(document).on("click", ".uav-start-yes",function(){
 	start_uav_jarvis(2, position);
 	
 	console.log("Starting UAV " + position);
@@ -817,7 +843,8 @@ $(document).on("click",".aerial-imaging-yes",function(){
 		url: url,
 		data: 'points=' + data,
 		success: success,
-		dataType: "jsonp"
+		dataType: "json",
+		async: true
 	});
 	
 	console.log("Yay!");
