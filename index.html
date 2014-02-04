@@ -15,16 +15,16 @@
 		<div class="row">
 			
 			<div class="col-md-1 data-types">
-				<div class="row hyperspectral">Hyperspectral</div>
+				<div class="row hyperspectral">Heatmaps</div>
 				<div class="row chloro">Chlorophyll</div>
 				<div class="row phy">Phycocyanin</div>
-				
 				<div class="row abc">Nitrogen</div>
 				<div class="row abc">Phosphorus</div>
 				<div class="row abc">Temperature</div>
 				<div class="row abc">Dissolved Oxygen</div>
 				<div class="row abc">pH</div>
 				<div class="row tracking">Tracking</div>
+				<div class="row show-aerial-images">Show Aerial Images</div>
 				
 			</div><!--/.data-types -->
 			
@@ -40,6 +40,7 @@
 				<div class="row archived-track-uav">Track UAV (Archived)</div>
 				<div class="row track-uav">Track UAV (Current)</div>
 				<div class="row start-uav">Start UAV</div>
+				<div class="row start-uav-throttle">Start UAV (Throttle)</div>
 			</div><!--/.tasks -->
 
 			<div class="col-md-2 chat-log">
@@ -52,7 +53,10 @@
 				<div class="col-md-1"><div class="sensor-reading"></div></div>
 				<div class="col-md-8">
 					<div class="date-slider"></div><!--/.slider -->
-					<div class="selected-value"></div>
+					<div style="float: left; margin: 5px 0 0 0;">Jan 1</div>
+					<div style="float: right; margin: 5px 0 0 0;">Feb 4</div>
+					<div class="clearfix"></div>
+					<div class="selected-value" style="text-align: center;">1 January, 2014</div>
 				</div><!--/.col-md-8 -->
 				
 				<div class="col-md-3 jarvis">
@@ -84,7 +88,7 @@
 		$(function() {
 			var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 			var start = "2014-01-02";
-			var end = "2014-02-01";
+			var end = "2014-02-05";
 			
 			$( ".date-slider" ).slider({
 					min: new Date(start).getTime(),
@@ -95,10 +99,27 @@
 								var date = new Date (timestamp);
 								var value = date.getDate() + " " + monthNames[date.getMonth()] + ", " + date.getFullYear();
 								$('.selected-value').html(value);
+								if (spectral) {
+									show_gaussian_plot(date.getDate());
+								}
 							}
 			});
 		});
 	</script>
-
+<script type="text/javascript" src="smile/js/aerial-imaging-script.js"></script>
+	
+	<script>
+		showingAerialImages = false;
+		$('.show-aerial-images').click(function() {
+			if( ! showingAerialImages ) {
+				overlay_magic();
+				showingAerialImages = true;
+				$('.show-aerial-images').css('color', '#fff');
+			}
+			else {
+				
+			}
+		});
+	</script>
 </body>
 </html>
