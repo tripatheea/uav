@@ -30,10 +30,10 @@ var coordinateMapType = new CoordMapType();
  */
 
 function initialize() {
-	var minZoomLevel = 7;
-	var myLatlng = new google.maps.LatLng(2.44480038, 1.82611289);
+	var minZoomLevel = 6;
+	var myLatlng = new google.maps.LatLng(-1.82611289, -2.44480038);
 	var mapOptions = {
-		zoom: (minZoomLevel),
+		zoom: (minZoomLevel + 1),
 		center: myLatlng,
 		mapTypeId: google.maps.MapTypeId.SATELLITE,
 		tilt: 0,
@@ -44,16 +44,27 @@ function initialize() {
 	}
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 	
-	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=3'; 
+	var holodeckURL = 'http://127.0.0.1/uav/gui/images/holodeck.png?r=2';
+	var floorPlanURL = 'http://127.0.0.1/uav/gui/images/floorplan.png?r=4'; 
 	
 	// x and y are flipped here.
-	floorBounds = new google.maps.LatLngBounds(
-								new google.maps.LatLng(0, 0),												// South-West
-								new google.maps.LatLng(4.889600753195714, 3.6522257702209595)				// North-East
+	holodeckBounds = new google.maps.LatLngBounds(
+								new google.maps.LatLng(-4.50222577, -6.38960075),								
+								new google.maps.LatLng(0.85, 1.5)											
 						);
 	
-	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds);
+	floorBounds = new google.maps.LatLngBounds(
+								
+								new google.maps.LatLng(-3.6522257702209595, -4.889600753195714),			
+								new google.maps.LatLng(0, 0)												
+						);
+	
+	holodeckOverlay = new google.maps.GroundOverlay(holodeckURL, holodeckBounds, { zIndex: 154215 } );
+	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds, { zIndex: 5 } );
+	
+	holodeckOverlay.setMap(map);
 	floorOverlay.setMap(map);
+	
 	
 	/* 
 	 * The followin is just to bind the custom map to Map.
@@ -104,93 +115,6 @@ function initialize() {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
-
-
-
-		
-				
-function show_cholorophyll() {
-	if( (typeof chlorophyll1 === 'undefined') || (chlorophyll1.length == 0) ) {
-		var coords1 = [
-						new google.maps.LatLng(42.3595, -71.0800),
-						new google.maps.LatLng(42.3594, -71.0799),
-						new google.maps.LatLng(42.3593, -71.0798),
-						new google.maps.LatLng(42.3594, -71.0794),
-						new google.maps.LatLng(42.3593, -71.0795),
-						new google.maps.LatLng(42.3590, -71.0790),
-						new google.maps.LatLng(42.3590, -71.0795),
-						new google.maps.LatLng(42.3590, -71.0797),
-						new google.maps.LatLng(42.3585, -71.0805),
-					  ];
-		var coords2 = [
-						new google.maps.LatLng(42.3535, -71.1000),
-						new google.maps.LatLng(42.3534, -71.1019),
-						new google.maps.LatLng(42.3533, -71.1018),
-						new google.maps.LatLng(42.3534, -71.1014),
-						new google.maps.LatLng(42.3530, -71.1015),
-						new google.maps.LatLng(42.3525, -71.1025),
-					  ];
-		chlorophyll1 = new google.maps.Polygon({
-											paths: coords1,
-											strokeColor: 'rgb(0, 146, 0)',
-											strokeOpacity: 0.8,
-											strokeWeight: 2,
-											fillColor: 'rgb(0, 146, 0)',
-											fillOpacity: 0.35
-										  });
-		chlorophyll2 = new google.maps.Polygon({
-											paths: coords2,
-											strokeColor: 'rgb(0, 146, 0)',
-											strokeOpacity: 0.8,
-											strokeWeight: 2,
-											fillColor: 'rgb(0, 146, 0)',
-											fillOpacity: 0.35
-										  });
-		chlorophyll1.setMap(map);
-		chlorophyll2.setMap(map);
-	}
-	else {
-		chlorophyll1.setMap(null);
-		chlorophyll2.setMap(null);
-		coords1 = [];
-		coords2 = [];
-		chlorophyll1 = [];
-		chlorophyll2 = [];
-	}
-}
-
-
-function show_phycocyanin() {
-	if( (typeof phycocyanin === 'undefined') || (phycocyanin.length == 0) ) {
-		var coords = [
-						new google.maps.LatLng(42.3535, -71.0970),
-						new google.maps.LatLng(42.3534, -71.0979),
-						new google.maps.LatLng(42.3533, -71.0988),
-						new google.maps.LatLng(42.3534, -71.0984),
-						new google.maps.LatLng(42.3533, -71.0975),
-						new google.maps.LatLng(42.3530, -71.0980),
-						new google.maps.LatLng(42.3530, -71.0995),
-						new google.maps.LatLng(42.3530, -71.0997),
-						new google.maps.LatLng(42.3525, -71.0975),
-					  ];
-		phycocyanin = new google.maps.Polygon({
-											paths: coords,
-											strokeColor: 'red',
-											strokeOpacity: 0.8,
-											strokeWeight: 2,
-											fillColor: 'red',
-											fillOpacity: 0.35
-										  });
-		phycocyanin.setMap(map);
-	}
-	else {
-		phycocyanin.setMap(null);
-		coords = [];
-		phycocyanin = [];
-	}
-}
-
 
 function createContext (marker, iw){
 	google.maps.event.addListener(marker,'click',function() {
@@ -387,9 +311,6 @@ $('.heatmaps').click(function() {
 	}
 });
 
-
-
-
 waterSensing = false;
 $('.water-probe').click(function() {
 	if( ! waterSensing ) {
@@ -446,7 +367,7 @@ $(document).on("click",".jarvis-imaging-2-yes",function(){
 	$('.jarvis').html(instructions['imaging'][3] + "<br><br>North West Coordinates: " + position[0] + "<br>South East Coordinates: " + position[1]);
 	
 	dataToTransmit = JSON.stringify(grids);
-	
+	console.log(dataToTransmit);
 	url = "http://127.0.0.1/uav/gui/tercio.php";
 	success = function() {
 			console.log("Yay!");
@@ -496,9 +417,41 @@ $(document).ready(function() {
 });
 
 count = 0;
+readingsForHeatMap = Object();
 function sensor_reading(coords) {
 	count++;
-	console.log(count);
+	//console.log(count);
+	 
+	if (count == 16) {
+		uavTracking = false;
+		console.log(readingsForHeatMap);
+		
+		send = Object();
+		send['values'] = readingsForHeatMap;
+		
+		var heatmapURL = "http://127.0.0.1/uav/gui/heatmaps/heatmap.php";
+		var data = $.ajax({
+					type: "POST",
+					url: heatmapURL,
+					data: send,
+					async: true,
+					dataType: "json"
+				}); // This will wait until you get a response from the ajax request.
+		data = data.responseText;
+		console.log(data);
+		
+		
+		window.setTimeout( function() {
+                                source = "http://127.0.0.1/uav/gui/heatmaps/interp.png";
+                                var gaussianBounds = floorBounds;
+                                var overlayOptions = {
+                                                        opacity: 0.7
+                                                    };
+                                gaussianOverlay = new google.maps.GroundOverlay(source, gaussianBounds, overlayOptions);
+                                gaussianOverlay.setMap(map);
+                            }, 1000 );
+	}
+	
 	
 	var url = "http://127.0.0.1/uav/gui/bridge-sensor.php";
 
@@ -511,6 +464,8 @@ function sensor_reading(coords) {
 	sensorReading = data.responseText;
 	sensorReading = JSON.parse(sensorReading);
 	sensorReading = sensorReading['channel'][7];
+	
+	readingsForHeatMap[count] = sensorReading;
 	
 	// This gets new coords
 	/*
@@ -548,7 +503,8 @@ function track_uav() {
 		
 		
 		/* This one's for receiving realtime data from Ben */
-		var url = "http://127.0.0.1/uav/gui/bridge.php";
+		//var url = "http://127.0.0.1/uav/gui/bridge.php";
+		var url = "http://127.0.0.1/uav/gui/sensor-demo/position.php";
 
 		var data = $.ajax({
 						url:  url,
@@ -562,7 +518,7 @@ function track_uav() {
 		there = there.transform;
 		
 		coords = [there.translation.x, there.translation.y];
-		
+		console.log(coords);
 		//console.log( [there.translation.x, there.translation.y, there.translation.z] );
 		
 		// We have the altitude as there.translation.z
@@ -580,13 +536,13 @@ function track_uav() {
 		// Not totally sure about the ordering. Do a trial run in Holodeck to confirm.
 		
 		uavMarker = new google.maps.Marker({
-								position: new google.maps.LatLng(coords[1], coords[0]),		// The ordering is 1, 0. This is NOT a mistake.
+								position: new google.maps.LatLng(-coords[0], -coords[1]),		// The ordering is 1, 0. This is NOT a mistake.
 								map: map,
 								title: 'UAV',
 								icon: 'http://127.0.0.1/uav/gui/images/icon.png'
 						});
 						
-		newPoint  = new google.maps.LatLng(coords[1], coords[0]);						// The ordering is 1, 0. This is NOT a mistake.
+		newPoint  = new google.maps.LatLng(-coords[0], -coords[1]);						// The ordering is 1, 0. This is NOT a mistake.
 		flightPlanCoordinates.push(newPoint);
 		
 		var flightPath = new google.maps.Polyline({
@@ -653,7 +609,21 @@ $('.start-uav-throttle').click(function() {
 function start_uav_throttle_jarvis(level) {
 	switch(level) {
 		case 0:
-		$('.jarvis').html("Please enter a throttle amount.<br><br><input type='number' class='throttle-value' value='1000' min='1000' max='1100' style='width: 45px;'>&nbsp;&nbsp;&nbsp;<a class='big-red-button-uav-throttle'>Start</a>");
+		//$('.jarvis').html("Please enter a throttle amount.<br><br><input type='number' class='throttle-value' value='1000' min='1000' max='1100' style='width: 45px;'>&nbsp;&nbsp;&nbsp;<a class='big-red-button-uav-throttle'>Start</a>");
+		var htmlContent = "Please enter a throttle amount.<br><br>";
+		
+		htmlContent += "<div style='width: 250px;'>";
+		htmlContent += "<div style='float: left;'><input oninput='send_throttle_level();' type='range' class='throttle-value' value='1000' min='1000' max='1100' style='width: 150px;'></div>";
+		htmlContent += "<div style='float: right;'><a class='big-red-button-uav-throttle'>Finish</a></div>";
+		htmlContent += "</div>";
+		
+		htmlContent += "<div style='width: 200px;' class='row'>";
+		htmlContent += "<div class='col-md-4'>Off</div>";
+		htmlContent += "<div class='col-md-4'>Low</div>";
+		htmlContent += "<div class='col-md-4'>High</div>";
+		htmlContent += "</div>";
+		$('.jarvis').html(htmlContent);
+		
 		break;
 		
 		case 1:
@@ -667,8 +637,10 @@ function start_uav_throttle_jarvis(level) {
 	}
 }
 
-$(document).on("click", ".big-red-button-uav-throttle", function() {
+
+function send_throttle_level() {
 	var throttle = $('.throttle-value').val();
+	console.log(throttle);
 	
 	data = Object();
 	data['throttle'] = throttle;
@@ -679,11 +651,15 @@ $(document).on("click", ".big-red-button-uav-throttle", function() {
 		type: "POST",
 		url: url,
 		data: data,
-		success: start_uav_throttle_jarvis(1),
 		async: true,
 		dataType: "json"
 	});
-	
+}
+
+$(document).on("click", ".big-red-button-uav-throttle", function() {
+	$('.throttle-value').val(1000);
+	$('.start-uav-throttle').trigger("click");
+	//start_uav_throttle_jarvis(1);
 });
 
 
@@ -694,12 +670,12 @@ function start_uav() {
 		 * Listen on the floorplan NOT on the map because the floorplan represents the bounds and the 
 		 * user should not be able to select a region outside these bounds.
 		 */
-		google.maps.event.addListener(floorOverlay, 'click', function(event) {
+		google.maps.event.addListener(holodeckOverlay, 'click', function(event) {
 														placeMarker(event.latLng);
 													});
 	}
 	else {
-		google.maps.event.clearListeners(floorOverlay, 'click');
+		google.maps.event.clearListeners(holodeckOverlay, 'click');
 		UAVMarker.setMap(null);
 	}
 }
@@ -872,3 +848,5 @@ function aerial_imaging_jarvis(stage, position) {
 		break;
 	}
 }
+
+

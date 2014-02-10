@@ -3,9 +3,9 @@
 	$data = $_POST;
 	
 	
-	//$url = "http://192.168.20.183:8000/waypoint";
+	$url = "http://192.168.20.183:8000/waypoint";
 	
-	$url = "http://bwingle.org/scl/waypoint.php";
+	//$url = "http://bwingle.org/scl/waypoint.php";
 	
 	//$myvars = array('throttle' => 1000);
 	

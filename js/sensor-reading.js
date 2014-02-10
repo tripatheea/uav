@@ -37,7 +37,7 @@ function sensor_reading_to_circles(position, reading) {	//position, color
 	
 	var circle = {};
 	circle = {
-		center: new google.maps.LatLng(position[1], position[0]),
+		center: new google.maps.LatLng(-position[0], -position[1]),
 		value: reading
 	};
 	

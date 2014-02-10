@@ -65,8 +65,8 @@ function draw_grid(position) {
 	for (var index in grids['points']) {
 		rect = grids['points'][index];
 		
-		var swBound = new google.maps.LatLng(rect['se'][1], rect['nw'][0]);
-		var neBound = new google.maps.LatLng(rect['nw'][1], rect['se'][0]);
+		var swBound = new google.maps.LatLng(rect['nw'][0], rect['se'][1]);
+		var neBound = new google.maps.LatLng(rect['se'][0], rect['nw'][1]);
 		
 		var bounds = new google.maps.LatLngBounds(swBound, neBound);
 		var selected = false;

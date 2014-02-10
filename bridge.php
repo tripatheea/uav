@@ -1,7 +1,7 @@
 <?php
 	// This one's for receiving UAV position and sensor data from Ben's server.
 
-	$url = "http://192.168.20.183:8000/vicon/UAV_CHRIS";
+	$url = "http://192.168.20.183:8000/vicon/UAV_CHRIS";		// OR UAV_RON
 	$url = "http://127.0.0.1/uav/gui/sensor-demo/position.php";
 	
 	/* gets the data from a URL */
