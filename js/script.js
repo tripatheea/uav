@@ -403,6 +403,7 @@ $('.track-uav').click(function() {
 		$('.track-uav').css('color', '#fff');
 		uavTracking = true;
 	}
+        uavMarker.setMap(null);
 });
 
 
@@ -416,7 +417,7 @@ $(document).ready(function() {
 				}, refreshRate);
 });
 
-count = 0;
+count = -1;
 readingsForHeatMap = Object();
 function sensor_reading(coords) {
 	count++;
@@ -427,29 +428,41 @@ function sensor_reading(coords) {
 		console.log(readingsForHeatMap);
 		
 		send = Object();
-		send['values'] = readingsForHeatMap;
+		//send['values'] = readingsForHeatMap;
+        
+        readings = Object();
+        count2 = 1;
+        for(var i = 0; i < 4; i++) {
+            for(var j = 0; j < 4; j++) {
+                readings[i + ',' + j] = readingsForHeatMap[count2];
+            }
+            count2++;
+        }
+        console.log(readings);
 		
-		var heatmapURL = "http://127.0.0.1/uav/gui/heatmaps/heatmap.php";
-		var data = $.ajax({
-					type: "POST",
-					url: heatmapURL,
-					data: send,
-					async: true,
-					dataType: "json"
-				}); // This will wait until you get a response from the ajax request.
-		data = data.responseText;
-		console.log(data);
+		var heatmapURL = "http://127.0.0.1:5000/generate_heatmap?data=" + JSON.stringify(readings) + "&callback=safsaf";
+        var data = $.ajax({
+                type: "GET",
+                url: heatmapURL,
+                async: true,
+                dataType: "jsonp"
+            });
+        
+        setTimeout(function() {
+            //reply = data.responseText;
+            reply = 'heatmap.png?r=' + Math.random();
+            
+            source = "http://127.0.0.1/uav/gui/heatmaps/heatmap/app/modules/heatmaps/" + reply;
+            var gaussianBounds = floorBounds;
+            var overlayOptions = {
+                                    opacity: 0.7
+                                };
+            gaussianOverlay = new google.maps.GroundOverlay(source, gaussianBounds, overlayOptions);
+            gaussianOverlay.setMap(map);
+        }, 1000);
+       
+
 		
-		
-		window.setTimeout( function() {
-                                source = "http://127.0.0.1/uav/gui/heatmaps/interp.png";
-                                var gaussianBounds = floorBounds;
-                                var overlayOptions = {
-                                                        opacity: 0.7
-                                                    };
-                                gaussianOverlay = new google.maps.GroundOverlay(source, gaussianBounds, overlayOptions);
-                                gaussianOverlay.setMap(map);
-                            }, 1000 );
 	}
 	
 	
@@ -557,6 +570,7 @@ function track_uav() {
 		uavMarker.setMap(map);
 	}
 	else {
+                flightPath.setMap(null);
 		uavMarker.setMap(null);
 	}
 }

@@ -1,14 +1,36 @@
 <?php
+    session_start();
+    
 	$x = mt_rand(0, 365.22257702209595) / 100;
 	$y = mt_rand(0, 488.9600753195714) / 100;
 	$z = mt_rand(0, 50)/10;
-	
+    
+    
+    $allX = Array(-3.9990234375, -3.01025390625, -1.724853515625, -0.3955078125, -0.626220703125, -2.04345703125, -3.076171875, -4.1748046875, -4.097900390625, -3.218994140625, -1.91162109375, -0.823974609375, -0.582275390625, -1.944580078125, -2.9443359375, -4.7021484375 );
+    $allY = Array(-0.3515602939922709, -0.4724067568442764, -0.2746571512146894,  -0.5602938041720732, -1.3292264529974207, -1.263325357489324, -1.4280747713669428, -1.1864386394452024, -2.1088986592431254, -2.3943223575350774,  -2.416275654706373, -2.317483068758292, -2.997898741103044, -2.9759559359447554, -3.1405161039832357, -3.5024553022772564);
+    
+    
+    if( ! isset($_SESSION['count'])) {
+        $_SESSION['count'] = 0;
+    }
+    
+    if($_SESSION['count'] == count($allX)) {
+        $_SESSION['count'] = 0;
+    }
+    
+    
+    $count = $_SESSION['count'];
+    
 	$data = Array();
 	$data['transform'] = Array();
 	$data['transform']['translation'] = Array();
-	$data['transform']['translation']['x'] = $x;
-	$data['transform']['translation']['y'] = $y;
-	$data['transform']['translation']['z'] = $z;
+	$data['transform']['translation']['x'] = -$allY[$count];
+	$data['transform']['translation']['y'] = -$allX[$_SESSION['count']];
+	$data['transform']['translation']['z'] = 0.1;
 	
+    
+    $_SESSION['count'] = $count + 1;
+    
+    
 	echo json_encode($data);
 ?>

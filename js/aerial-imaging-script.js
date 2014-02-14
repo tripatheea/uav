@@ -48,18 +48,25 @@
 			for (i = 0; i < tiles.length; i++) {
 				tile = tiles[i];
 				
-				var nw = [ -tile['coordinates']['nw'][1], -tile['coordinates']['nw'][0] ]; 
-				var se = [ -tile['coordinates']['se'][1], -tile['coordinates']['se'][0] ]; 
+				var nw = [ -tile['coordinates']['nw'][0], -tile['coordinates']['nw'][1] ]; 
+				var se = [ -tile['coordinates']['se'][0], -tile['coordinates']['se'][1] ]; 
 				
 				console.log(nw + '');
 				console.log(se + '\n');
 	
 				var imgURL = tile['path'];
-				var imageBounds = new google.maps.LatLngBounds(
+                                
+                                var imageBounds = new google.maps.LatLngBounds(
 										  new google.maps.LatLng(nw[1], se[0]),
 										  new google.maps.LatLng(se[1], nw[0])
 									);
-				
+                                
+                                /*
+				var imageBounds = new google.maps.LatLngBounds(
+										  new google.maps.LatLng(se[0], nw[1]),
+										  new google.maps.LatLng(nw[0], se[1])
+									);
+				*/
 				overlay = new google.maps.GroundOverlay(imgURL, imageBounds);
 				//overlays.push(overlay);
 				overlay.setMap(map);
@@ -83,11 +90,12 @@
 		
 		function overlay_magic() {
 			overlays = prepare_overlay();
+                       
             
-            /*
+                        /*
 			for (i = 0; i < overlays.length; i++) {
 				overlays[i].setMap(map);
 			}
 			console.log('Fetching new tiles.');
-            */
+                        */
 		}

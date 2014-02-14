@@ -24,8 +24,6 @@ function show_gaussian_plot(day) {
 	var day = day - 1;
 	var source = plots[day];
 	
-	
-	
 	/*
 	var gaussianBounds = new google.maps.LatLngBounds(
 									new google.maps.LatLng(40.712216, -74.22655),
