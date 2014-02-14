@@ -95,7 +95,7 @@ class Data():
         spikedcellValue = spikeSize*self.data[pickedcellx][pickedcelly]
         self.data[pickedcellx][pickedcelly] = spikedcellValue if spikedcellValue < 1 else 1
 	
-    def updateDataAndSave(self, newsampleX, newsampleY, newsampleValue):
+    def updateDataAndSave(self, newsampleX, newsampleY, newsampleValue, filename):
         ''' Point-wise update of the sample values'''
 
         if not (len(newsampleX) == len(newsampleY) and len(newsampleY) == len(newsampleValue)):
@@ -110,7 +110,8 @@ class Data():
             self.data[nsX][nsY] = nsV 
         self.interpolate()	
         print( self.getInterpData())
-        self.showAndSave( self.getInterpData(), 0, './modules/updatedAt'+str(np.int(time.time()*100000)) )
+        #self.showAndSave( self.getInterpData(), 0, './modules/updatedAt'+str(np.int(time.time()*100000)) )
+        self.showAndSave( self.getInterpData(), 0, filename )
 
     def getInterpData(self):
         return self.interpData

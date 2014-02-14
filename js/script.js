@@ -59,7 +59,7 @@ function initialize() {
 								new google.maps.LatLng(0, 0)												
 						);
 	
-	holodeckOverlay = new google.maps.GroundOverlay(holodeckURL, holodeckBounds, { zIndex: 154215 } );
+	holodeckOverlay = new google.maps.GroundOverlay(holodeckURL, holodeckBounds, { zIndex: 6 } );
 	floorOverlay = new google.maps.GroundOverlay(floorPlanURL, floorBounds, { zIndex: 5 } );
 	
 	holodeckOverlay.setMap(map);

@@ -32,7 +32,7 @@ def generate_heatmap_png(readings):
     filename = 'heatmap' + '.png'
     data = Data(16)
     data.showAndSave(data.getInterpData(), 0, './modules/heatmaps/' + str(filename))
-    
+    data.updateDataAndSave(xs, ys, values, './modules/heatmaps/' + str(filename))
     return filename
 
 
