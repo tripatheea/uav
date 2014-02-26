@@ -1,0 +1,63 @@
+html { 
+  background: url(../images/common/bckg.png) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.help {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.help-image {
+  cursor: pointer;
+}
+
+.title-and-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 100px;
+  margin-left: -100px;
+  margin-top: -50px;
+  text-align: center;
+}
+
+.title-and-buttons .title {
+  
+}
+
+.title-and-buttons .title .title-underline {
+  width: 0%;
+  overflow: hidden;
+  animation: title-underline-animation 1.5s ease 0.5s forwards;
+  -webkit-animation: title-underline-animation 1.5s ease 0.5s forwards; /* Safari and Chrome */
+}
+
+/** Animation for the title underline */
+
+@keyframes title-underline-animation {
+  0%   { width: 0%;   }
+  100% { width: 100%; }
+}
+
+@-webkit-keyframes title-underline-animation  {
+  0%   { width: 0%;  }
+  100% { width: 100%; }
+}
+
+/** Animation for the title underline ends */
+
+.title-and-buttons .go {
+  margin-top: 50px;
+}
+
+.go-image {
+  cursor: pointer;
+}

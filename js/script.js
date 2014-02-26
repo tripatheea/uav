@@ -1,12 +1,9 @@
 /*
- * The following code is to remove the Satellite / Hybrid / Terrain / Roadmap map and instead show a gray area.
+ * The following couple of functions is to remove the Satellite / Hybrid / Terrain / Roadmap map and instead show a gray area.
  *
- * I'm just creating a custom maptype but not supplying any tile sources to force Maps to show the defauly- the gray tiles.
+ * I'm just creating a custom maptype but not supplying any tile sources to force Maps to show the default gray tiles.
  * 
  */
-
-
-
 function CoordMapType() {
 }
 
@@ -104,7 +101,7 @@ function initialize() {
 		if (y < minY) y = minY;
 		if (y > maxY) y = maxY;
 
-		map.setCenter(new google.maps.LatLng(y, x));
+		//map.setCenter(new google.maps.LatLng(y, x));
 	});
 
 	// Limit the zoom level
@@ -403,12 +400,14 @@ $('.track-uav').click(function() {
 		$('.track-uav').css('color', '#fff');
 		uavTracking = true;
 	}
-        uavMarker.setMap(null);
+    if( typeof uavMarker !== "undefined") {
+      uavMarker.setMap(null);
+    }
 });
 
 
 $(document).ready(function() {
-	refreshRate = 100;			// In milliseconds.
+	refreshRate = 250;			// In milliseconds.
 	setInterval(function() { 
 					if (uavTracking) {
 						track_uav();
@@ -422,9 +421,10 @@ readingsForHeatMap = Object();
 function sensor_reading(coords) {
 	count++;
 	//console.log(count);
-	 
-	if (count == 16) {
-		uavTracking = false;
+  
+  readingsToTake = 16;    // How many readings to take before showing the heatmap.
+	if (count == readingsToTake) {
+		uavTracking = false;     // This stops tracking the UAV.
 		console.log(readingsForHeatMap);
 		
 		send = Object();
@@ -444,7 +444,7 @@ function sensor_reading(coords) {
         var data = $.ajax({
                 type: "GET",
                 url: heatmapURL,
-                async: true,
+                async: false,
                 dataType: "jsonp"
             });
         
@@ -536,7 +536,7 @@ function track_uav() {
 		
 		// We have the altitude as there.translation.z
 		// Check if it's below a certain cutoff and color the tile only if the z-value is less than a certain value.
-		altitudeCutoff = 1;
+		altitudeCutoff = 0.14;
 		if ( there.translation.z < altitudeCutoff ) {
 			//console.log("Coloring...");
 			sensor_reading(coords);
@@ -570,7 +570,7 @@ function track_uav() {
 		uavMarker.setMap(map);
 	}
 	else {
-                flightPath.setMap(null);
+    flightPath.setMap(null);
 		uavMarker.setMap(null);
 	}
 }
@@ -584,7 +584,8 @@ function placeMarker(location) {
   } else {
 	UAVMarker = new google.maps.Marker({
 	  position: location,
-	  map: map
+	  map: map,
+    icon: 'http://127.0.0.1/uav/gui/images/icon.png'
 	});
   }
   position = [location['e'], location['d']];
@@ -665,7 +666,7 @@ function send_throttle_level() {
 		type: "POST",
 		url: url,
 		data: data,
-		async: true,
+		async: false,
 		dataType: "json"
 	});
 }
@@ -835,7 +836,7 @@ $(document).on("click",".aerial-imaging-yes",function(){
 		data: 'points=' + data,
 		success: success,
 		dataType: "json",
-		async: true
+		async: false
 	});
 	
 	console.log("Yay!");

@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask import request
+from flask import Response
 
 from generate_heatmap import *
 import time
@@ -35,6 +36,12 @@ def generate_heatmap_png(readings):
     data.updateDataAndSave(xs, ys, values, './modules/heatmaps/' + str(filename))
     return filename
 
+@app.route('/simulate_aerial_image_data')
+def simulate_aerial_image_data():
+  sampleData = '[1341414,["-2.0,-1.0","1.0,-1.0","1.0,-2.0","2.0,-2.0","2.0,-1.0","-1.0,-1.0"]]'
+  sampleData = 'var b = 2;'
+  response = Response(response=sampleData, status=200, headers=None, mimetype='text/javascript', content_type=None, direct_passthrough=False)
+  return response
 
 if __name__ == '__main__':
   app.run(debug=True)
