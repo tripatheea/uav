@@ -7,7 +7,7 @@
 	//$data = json_encode($data);
 	//$data = json_decode($data);
 
-	$url = Array('http://www.bwingle.org/scl/', 'http://128.31.33.105:8080/UAV/TURC');
+	$url = Array('http://128.31.34.93:9090/TP/TP');
 	
 	//$myvars = array('points' => $data, 'api_key' => '6175007565');
 	

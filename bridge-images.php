@@ -1,7 +1,6 @@
 <?php
 	// This one's for receiving UAV position and sensor data from Ben's server.
 
-	$url = "http://192.168.20.183:8000/roscopter/rc";
 	$url = "http://192.168.20.183:8000/tile";
 	
 	/* gets the data from a URL */
@@ -19,4 +18,7 @@
 	
 	$data = get_data($url);
 	
+  $data = '[1341414,["-2.0,-1.0","1.0,-1.0","1.0,-2.0","2.0,-2.0","2.0,-1.0","-1.0,-1.0"]]';
+  
+  
 	echo $data;
