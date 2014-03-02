@@ -1,9 +1,9 @@
 		function get_all_tiles() {
-			var width = 1;
-			var height = 1;
+			var width = 0.1;
+			var height = 0.1;
                                                 
       var url = "http://127.0.0.1/uav/gui/bridge-images.php";
-      var baseImgURL = 'http://127.0.0.1/uav/gui/smile/tiles/';
+      var baseImgURL = 'http://127.0.0.1/uav/gui/smile/tiles/new/';
       //var baseImgURL = 'http://192.168.20.183:8000/static/tiles/';
 
 			var data = $.ajax({
@@ -84,8 +84,8 @@
           //console.log(imgURL);
           
           var imageBounds = new google.maps.LatLngBounds(
-                                                            new google.maps.LatLng(nw[1], se[0]),
-                                                            new google.maps.LatLng(se[1], nw[0])
+                                                            new google.maps.LatLng(1 + nw[1], se[0]),
+                                                            new google.maps.LatLng(1 + se[1], nw[0])
                                                   );
           /*
           var imageBounds = new google.maps.LatLngBounds(
