@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta content="charset=utf-8">
+	
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./assets/third-party/fancybox/jquery.fancybox.css" type="text/css" media="screen">
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="./assets/css/interface2.css" type="text/css" media="screen">
+  
+  
+  <title>RemoteSense</title>
+</head>
+<body>
+  
+<div id="map-canvas" style="width: 100%; height: 100%;"></div>
+  	
+  <div class="help"><a class="help-me" href="#help-content"><img src="./assets/images/common/help.png" class="help-image"></a></div>
+  <div class="hud"><img src="./assets/images/individual/interface/hud_on.png" class="hud-image toggle-transient"></div>
+  
+  <div class="top-bar row">
+    
+    <div class="left-line" style="float: left; text-align: right;">
+      <img src="./assets/images/common/filler.png" style="width: 95%; height: 1px;">
+    </div>
+    
+    <div class="center-title" style="padding: 0 15px 0 15px; float: left; text-align: center; width: 180px; overflow: hidden;">
+      <img class="top-bar-title" src="./assets/images/individual/interface/title.png">
+    </div>
+    
+    <div class="right-line" style="float: right; text-align: left;">
+      <img src="./assets/images/common/filler.png" style="width: 95%; height: 1px;">
+    </div>
+  
+    <div class="clearfix"></div>
+    
+  </div><!--/.top-bar -->
+  
+  
+  
+  <!--<div class="flying-region-border flying-region-top transient"></div>
+  <div class="flying-region-border flying-region-right transient"></div>
+  <div class="flying-region-border flying-region-bottom transient"></div>
+  <div class="flying-region-border flying-region-left transient"></div>-->
+  
+  
+  <div class="dashboard transient">
+    <div id="tabs">
+      
+      <ul>
+        <li><a href="#task">Task</a></li>
+        <li><a href="#data">Data</a></li>
+      </ul>
+      
+      <div id="task">
+        <div class="track-uav dashboard-buttons">Track UAV</div>
+        <div class="track-uav dashboard-buttons">Modify Path</div>
+        <div class="track-uav dashboard-buttons">Send Home</div>
+      </div><!--/.task -->
+      
+      <div id="data">
+        Tab 2<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+      </div><!--/.data -->
+    
+    </div><!--/.tabs -->
+  </div><!--/.dashboard -->
+    
+  
+  
+  <div style="display:none">
+    <div id="help-content">
+      
+      <h4><u>The Interface</u></h4>
+      
+      <p style="text-align: justify;">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vulputate ullamcorper tincidunt. Nulla facilisi. Maecenas lorem ipsum, laoreet quis nibh sed, egestas viverra nisl. Curabitur id semper erat, ut tincidunt tellus. Curabitur libero velit, posuere in bibendum eget, fermentum id mauris. Donec dui eros, egestas nec auctor luctus, consequat ac erat. Vestibulum non tempus eros. Ut convallis at libero et congue. Sed convallis eleifend quam, vel pretium dui gravida vitae. Phasellus egestas rutrum neque eget tincidunt. Proin sollicitudin, dui eget euismod consequat, nisl velit tempus nibh, ac ultricies neque orci sed mauris. Nam tempus urna at est suscipit laoreet. Curabitur pulvinar, tortor et hendrerit ultricies, quam dui consequat arcu, vel dapibus quam massa ut turpis. Mauris vulputate placerat nunc, id feugiat arcu. Praesent tincidunt ultrices neque at euismod. Phasellus quis purus eu lectus varius vehicula.
+      </p>
+      
+      <p style="text-align: justify;">
+        Aenean tempus elementum sodales. Etiam ante lectus, fringilla eget magna eu, ultricies tristique turpis. Aenean molestie diam eu nisi feugiat, vel congue ante laoreet. Phasellus commodo ac arcu ornare viverra. Aliquam elementum sapien vestibulum lacus facilisis facilisis. Donec cursus fringilla sem, in dignissim nulla. In massa ante, volutpat id condimentum sit amet, malesuada vel lectus. Nunc sit amet eros quis odio dictum luctus. Aliquam sed turpis interdum lorem tempus rhoncus at non turpis.
+      </p>
+    
+    </div><!--/.help-content -->
+  </div><!--/.help-lightbox-no-display -->
+  
+  
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
+  <script src="./assets/third-party/fancybox/jquery.fancybox.js"></script>
+  
+  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+  <script type="text/javascript" src="./assets/js/maps/map.label.compiled.js"></script>
+  <script src="./assets/js/maps/helper.js"></script> 
+  <script src="./assets/js/maps/show.map.js"></script> 
+  <script src="./assets/js/maps/sensor.reading.js"></script>
+  <script src="./assets/js/maps/track.uav.js"></script> 
+
+  
+  <script type="text/javascript">
+    
+    function resize_topbar() {
+      var widthOfTitleImage = 150;    // Do not include the padding. Just the image.
+      var screenWidth = $( document ).width();
+      var widthForLines = screenWidth - widthOfTitleImage;
+      
+      var leftLineWidth = widthForLines * 0.5 - 15;
+      var rightLineWidth = widthForLines * 0.5 - 15;
+      
+      $('.left-line').css( "width", leftLineWidth );
+      $('.right-line').css( "width", rightLineWidth );
+    }
+    
+    resize_topbar();
+    $(window).resize(function() {
+      resize_topbar();
+    });
+    
+    var hudOnImage = "./assets/images/individual/interface/hud_on.png";
+    var hudOffImage = "./assets/images/individual/interface/hud_off.png";
+    
+    $('.toggle-transient').click(function() {
+      $('.transient').toggle();
+      //$('.hud-image').attr("src", "
+      currentImageSrc = $('.hud-image').attr("src");
+
+      if (currentImageSrc == hudOnImage) {
+        $('.hud-image').attr("src", hudOffImage);
+      }
+      else {
+        $('.hud-image').attr("src", hudOnImage);
+      }
+    });
+  </script>
+  
+  
+  <script>
+    $(function() {
+      $( "#tabs" ).tabs(  );
+    });
+  </script>
+  
+  <script type="text/javascript">
+    // Fire lightbox when help is clicked.
+    $(document).ready(function() {
+      $(".help-me").fancybox({
+        'width': 650,
+        'height': 400,
+        'autoDimensions': false,
+        'autoSize': false
+      });
+    });
+  </script>
+  
+</body>
+</html>

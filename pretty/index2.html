@@ -13,20 +13,75 @@
 </head>
 <body>
   	
-  <div class="help"><img src="./assets/images/common/help.png" class="help-image"></div>
+  <div class="help extra-padding"><img src="./assets/images/common/help.png" class="help-image"></div>
   
   <div class="top-bar row">
     
-    <div style="width: 40%; padding: 0; position: absolute; top: 0px; left: 0px;">
-      <img src="./assets/images/common/filler.png" style="width: 100%; height: 1px; margin: 0 15px 0 0;">
+    <div class="left-line" style="float: left;">
+      <img src="./assets/images/common/filler.png" style="width: 100%; height: 1px;">
     </div>
-    <div style="width: 20%; padding: 0; text-align: center; position: absolute; z-index: 3;">
+    
+    <div class="center-title" style="padding: 0 15px 0 15px; float: left; text-align: center; width: 155px; overflow: hidden;">
       <img class="top-bar-title" src="./assets/images/common/title-medium.png">
     </div>
-    <div style="width: 40%; padding: 0; margin: 0; top: 0px; right: 15px;">
-      <img src="./assets/images/common/filler.png" style="width: 80%; height: 1px; margin: 0 0 0 15px;">
+    
+    <div class="right-line" style="float: right; text-align: left;">
+      <img src="./assets/images/common/filler.png" style="width: 95%; height: 1px;">
     </div>
+  
+    <div class="clearfix"></div>
+    
   </div><!--/.top-bar -->
+  
+  <div class="choose-method">
+    
+    <div class="survey">
+      <img src="./assets/images/individual/choose-screen/survey.png">
+    </div><!--/.survey -->
+    
+    <div class="middle-line">
+      <img src="./assets/images/common/filler.png" style="width: 100%; height: 1px;">
+    </div><!--/.middle-line -->
+    
+    <div class="analyse">
+      <a href="./index4.html"><img src="./assets/images/individual/choose-screen/analyse.png"></a>
+    </div><!--/.analyse -->
+    
+    <div class="clearfix"></div>
+    
+  </div><!--/.choose-method -->
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
+  
+  <script type="text/javascript">
+    
+    function resize_topbar() {
+      var screenWidth = $( document ).width();
+      var widthForLines = screenWidth - 125;
+      
+      var leftLineWidth = widthForLines * 0.5 - 15;
+      var rightLineWidth = widthForLines * 0.5 - 15;
+      
+      $('.left-line').css( "width", leftLineWidth );
+      $('.right-line').css( "width", rightLineWidth );
+    }
+    
+    function resize_choose_method() {
+      var screenWidth = $( '.choose-method' ).width();
+      var middleLineWidth = screenWidth - 2*102 - 1;
+      
+      $('.middle-line').css( "width", middleLineWidth );
+    }
+    
+    resize_topbar();
+    resize_choose_method();
+    $(window).resize(function() {
+      resize_topbar();
+      resize_choose_method();
+    });
+    
+    
+  </script>
   
 </body>
 </html>

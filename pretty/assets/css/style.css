@@ -12,10 +12,16 @@ html {
   position: absolute;
   right: 10px;
   top: 10px;
+  z-index: 99;
 }
 
 .help-image {
   cursor: pointer;
+}
+
+.extra-padding {
+  width: 40px;
+  right: 0px;
 }
 
 .title-and-buttons {
@@ -67,8 +73,8 @@ html {
   background-position: 0 0;
   width: 50px;
   height: 50px;
-  animation: go-button-animation 0.75s ease 0 infinite alternate; 
-  -webkit-animation: go-button-animation 0.75s ease 0 infinite alternate; 
+  animation: go-button-animation 2s ease 0 infinite alternate; 
+  -webkit-animation: go-button-animation 2s ease 0 infinite alternate; 
 }
 
 .title-and-buttons .go-wrapper .go-hover {
@@ -109,3 +115,29 @@ html {
   top: 15px;
 }
 
+
+.choose-method {
+  width: 40%;
+  height: 102px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -51px;
+  margin-left: -20%;
+}
+
+.choose-method .survey {
+  float: left;
+  width: 102px;
+}
+
+.choose-method .middle-line {
+  float: left;
+  margin-top: 38px;
+  text-align: center;
+}
+
+.choose-method .analyse {
+  float: right;
+  width: 102px;
+}
