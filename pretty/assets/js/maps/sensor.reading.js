@@ -1,54 +1,5 @@
-
-count = -1;
-readingsForHeatMap = Object();
 function sensor_reading(coords) {
-  count++;
-  //console.log(count);
-  
-  readingsToTake = 16;    // How many readings to take before showing the heatmap.
-  if (count == readingsToTake) {
-    uavTracking = false;     // This stops tracking the UAV.
-    console.log(readingsForHeatMap);
-    
-    send = Object();
-    //send['values'] = readingsForHeatMap;
-        
-        readings = Object();
-        count2 = 1;
-        for(var i = 0; i < 4; i++) {
-            for(var j = 0; j < 4; j++) {
-                readings[i + ',' + j] = readingsForHeatMap[count2];
-            }
-            count2++;
-        }
-        console.log(readings);
-    
-    var heatmapURL = "http://127.0.0.1:5000/generate_heatmap?data=" + JSON.stringify(readings) + "&callback=safsaf";
-        var data = $.ajax({
-                type: "GET",
-                url: heatmapURL,
-                async: false,
-                dataType: "jsonp"
-            });
-        
-        setTimeout(function() {
-            //reply = data.responseText;
-            reply = 'heatmap.png?r=' + Math.random();
-            
-            source = "http://127.0.0.1/uav/gui/heatmaps/heatmap/app/modules/heatmaps/" + reply;
-            var gaussianBounds = floorBounds;
-            var overlayOptions = {
-                                    opacity: 0.7
-                                };
-            gaussianOverlay = new google.maps.GroundOverlay(source, gaussianBounds, overlayOptions);
-            gaussianOverlay.setMap(map);
-        }, 1000);
-       
 
-    
-  }
-  
-  
   var url = "http://127.0.0.1/uav/gui/bridge-sensor.php";
 
   var data = $.ajax({
@@ -60,8 +11,6 @@ function sensor_reading(coords) {
   sensorReading = data.responseText;
   sensorReading = JSON.parse(sensorReading);
   sensorReading = sensorReading['channel'][7];
-  
-  readingsForHeatMap[count] = sensorReading;
   
   // This gets new coords
   /*

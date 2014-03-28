@@ -68,6 +68,7 @@ if($_SESSION['count'] >= count($prerecordedFlight)) {
     $_SESSION['count'] = 0;
 }
 
+$trueFalse = Array(true, false, false, true, false, false, false, false);
 
 $count = $_SESSION['count'];
   
@@ -77,6 +78,7 @@ $data['transform']['translation'] = Array();
 $data['transform']['translation']['x'] = - ( $prerecordedFlight[$_SESSION['count']]['x'] - 0.005 );
 $data['transform']['translation']['y'] = - ( $prerecordedFlight[$_SESSION['count']]['y'] - 1.41 );
 $data['transform']['translation']['z'] = - $prerecordedFlight[$_SESSION['count']]['z'];
+$data['bool'] = $trueFalse[rand(0, 7)];
 $data['transform']['count'] = $count;
   
 $_SESSION['count'] = $count + 1;

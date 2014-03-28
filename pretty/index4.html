@@ -40,32 +40,13 @@
   </div><!--/.top-bar -->
   
   
-  
-  <!--<div class="flying-region-border flying-region-top transient"></div>
-  <div class="flying-region-border flying-region-right transient"></div>
-  <div class="flying-region-border flying-region-bottom transient"></div>
-  <div class="flying-region-border flying-region-left transient"></div>-->
-  
-  
   <div class="dashboard transient">
-    <div id="tabs">
-      
-      <ul>
-        <li><a href="#task">Task</a></li>
-        <li><a href="#data">Data</a></li>
-      </ul>
-      
-      <div id="task">
-        <div class="track-uav dashboard-buttons">Track UAV</div>
-        <div class="track-uav dashboard-buttons">Modify Path</div>
-        <div class="track-uav dashboard-buttons">Send Home</div>
-      </div><!--/.task -->
-      
-      <div id="data">
-        Tab 2<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      </div><!--/.data -->
-    
-    </div><!--/.tabs -->
+      <div class="actions">
+        <div class="plan-uav-hs dashboard-buttons">Plan UAV-HS</div>
+        <div class="launch-uav-hs dashboard-buttons">Launch UAV-HS</div>
+        <div class="plan-uav-wp dashboard-buttons">Plan UAV-WP</div>
+        <div class="launch-uav-wp dashboard-buttons">Launch UAV-WP</div>
+      </div><!--/.actions -->
   </div><!--/.dashboard -->
     
   
@@ -97,10 +78,15 @@
   <script type="text/javascript" src="./assets/js/maps/map.label.compiled.js"></script>
   <script src="./assets/js/maps/helper.js"></script> 
   <script src="./assets/js/maps/show.map.js"></script> 
+  <script src="./assets/js/maps/plan.uav.hs.js"></script>
+  <script src="./assets/js/maps/track.uav.hs.js"></script>
+  <script src="./assets/js/maps/plan.uav.wp.js"></script>
+  <script src="./assets/js/maps/track.uav.wp.js"></script>
   <script src="./assets/js/maps/sensor.reading.js"></script>
-  <script src="./assets/js/maps/track.uav.js"></script> 
+  <script src="./assets/js/maps/hs.detection.js"></script>
+  <script src="./assets/js/maps/keydragzoom_packed.js"></script>
+  <script src="./assets/js/maps/regions.js"></script>
 
-  
   <script type="text/javascript">
     
     function resize_topbar() {
@@ -134,13 +120,6 @@
       else {
         $('.hud-image').attr("src", hudOnImage);
       }
-    });
-  </script>
-  
-  
-  <script>
-    $(function() {
-      $( "#tabs" ).tabs(  );
     });
   </script>
   

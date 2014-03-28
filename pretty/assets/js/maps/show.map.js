@@ -1,4 +1,4 @@
-flyingRegionCoordinates = [[-5.7, -4.3], [0.05, 1.55]];
+flyingRegionCoordinates = [[-5.615979190472412, -4.2186994552612305], [0.000006660653112271957, 1.4063005447387695]];   // sw(x, y), ne(x, y)
 tileSize = 128;
 minZoomLevel = 7;
 maxZoomLevel = 9;
@@ -76,26 +76,54 @@ function initialize() {
 	map.setMapTypeId('coordinate');
   
   flyingGridBounds = new google.maps.LatLngBounds(
-                      new google.maps.LatLng(flyingRegionCoordinates[0][0], flyingRegionCoordinates[0][1]),								
-                      new google.maps.LatLng(flyingRegionCoordinates[1][0], flyingRegionCoordinates[1][1])											
+                      new google.maps.LatLng(flyingRegionCoordinates[0][0], flyingRegionCoordinates[1][1]),								
+                      new google.maps.LatLng(flyingRegionCoordinates[1][0], flyingRegionCoordinates[0][1])											
                   );
+
+  // Draw the grids.
+  var nw = [ flyingRegionCoordinates[1][0], flyingRegionCoordinates[0][1] ];
+  var se = [ flyingRegionCoordinates[0][0], flyingRegionCoordinates[1][1] ];
+  
+  draw_grid([nw, se]);
 
   // The following is to limit panning to the region defined by the flying region.
   
   var allowedBounds = flyingGridBounds;
 
+  // Show all markers.
 
+  // The debug marker.
   var marker = new google.maps.Marker({
       position: new google.maps.LatLng(-2, -7),
       map: map,
       draggable: true,
       title: 'Hello World!'
   });
-  
+
+  z = 0;
   google.maps.event.addListener(marker, 'dragend', function(event) {
-    console.log(event.latLng['k'] + "," + event.latLng['A']);
+    console.log("'" + z + "' => Array(" + "'x' => " + event.latLng['k'] + ", 'y' => " + event.latLng['A'] + ", 'z' => " + ((Math.random() * (1.000 - 0.0000) + 0.0000).toFixed(4)) + " ),");
+    
+    console.log(point_to_tile([event.latLng['k'] , event.latLng['A']]));
+    z++;
   });
+
+  // The home marker.
+  homeHS = new google.maps.Marker({
+      position: new google.maps.LatLng( -0.6842872324696173, -5.06640625 ),
+      map: map,
+      icon: 'http://127.0.0.1/uav/gui/pretty/assets/images/individual/interface/home.png?v=1',
+      title: 'UAV-HS Home'
+  }); 
   
+  // Home 2 marker.
+  homeWP = new google.maps.Marker({
+      position: new google.maps.LatLng( -1.1653649838677018, -5.077392578125 ),
+      map: map,
+      icon: 'http://127.0.0.1/uav/gui/pretty/assets/images/individual/interface/home2.png',
+      title: 'UAV-WP Home'
+  });
+
   // Listen for the dragend event
   google.maps.event.addListener(map, 'dragend', function() {
     
@@ -152,7 +180,7 @@ function calculate_markers_position() {
 
   gridWidth = flyingRegionWidth / 4;
   gridHeight = flyingRegionHeight / 4;
-  
+
   positions = [];
   for (i = 1; i < 8; i += 2) {
     for (j = 1; j < 8; j += 2) {
